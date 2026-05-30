@@ -1,0 +1,20 @@
+Game Name: (working title)
+
+Genre:
+Fantasy RPG
+
+Goal:
+Explore the world, fight enemies, collect loot, become stronger.
+
+Core Features:
+- Player movement
+- Combat
+- Enemies
+- Inventory
+- Equipment
+- Quests
+
+Inspiration:
+Terraria
+Dead Cells
+2D Games

@@ -1,0 +1,7 @@
+[ ] Create game window
+[ ] Display player on screen
+[ ] Move player with keyboard
+[ ] Spawn one enemy
+[ ] Attack enemy
+[ ] Enemy loses health
+[ ] Enemy dies
