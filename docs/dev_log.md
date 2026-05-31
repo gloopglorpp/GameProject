@@ -1,11 +1,23 @@
 2026-05-30
 
-- Created project structure
-
-- Learned basic Python imports
-
-- Built text combat prototype
-
-- Added Pygame window
-
-- Added WASD movement
+- Created initial project structure and planning documents
+- Defined game concept and first development tasks
+- Installed and configured VS Code
+- Ran first Python program successfully
+- Learned variables, user input, and type conversion
+- Learned how Python imports work across multiple files
+- Created player, enemy, and combat modules
+- Built first text-based combat prototype
+- Added player XP progression
+- Created reusable attack function
+- Built first combat loop
+- Installed Pygame
+- Created first game window
+- Learned the basics of the game loop and rendering
+- Drew first object on screen
+- Added WASD movement controls
+- Learned Pygame coordinate system
+- Set up Git repository
+- Connected project to GitHub
+- Added .gitignore and cleaned repository files
+- Started development journal

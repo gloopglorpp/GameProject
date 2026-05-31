@@ -1,0 +1,203 @@
+# Development Journal
+
+## 2026-05-30 — Created Project Structure
+
+Before writing any significant code, I spent some time thinking about what I was actually trying to build. My initial instinct was to jump straight into programming, but I realised that even a simple game needs some direction. I wrote down a rough game concept and created a task list containing the smallest features required to get a playable version working.
+
+One of the first things I noticed is that software projects are different from coding exercises. A coding exercise can live entirely inside a single file, but a project quickly becomes difficult to manage if everything is thrown together. To avoid this, I created a basic folder structure for the project.
+
+The project was divided into separate areas for source code, assets, and documentation. Although the folders were mostly empty at the beginning, creating them helped establish a clear place for future work. Instead of constantly asking where new files should go, there was already a structure in place.
+
+This was also my first introduction to the difference between a script and a project. A script is usually written to perform one task and can often fit comfortably into a single file. A project is larger and tends to consist of many connected pieces that work together. Even though the game is still extremely simple, organising it from the start made it feel more like a real software project than an experiment.
+
+Looking back, this step did not produce anything visible on screen, but it laid the foundation for everything that followed. The project became easier to navigate, easier to expand, and easier to think about. It was the point where the idea stopped being something in my head and started becoming something tangible.
+
+### Current Structure
+
+- `src/` for game code
+- `assets/` for images, sounds, and other resources
+- `docs/` for planning, notes, and development journals
+
+### Lessons Learned
+
+- A project benefits from planning before coding begins.
+- Breaking work into small tasks makes large goals feel manageable.
+- Organised folder structures reduce confusion as a project grows.
+- A script and a software project are not the same thing.
+- Good organisation may not be visible to the player, but it makes development significantly easier.
+
+## 2026-05-30 — First Steps in Python
+
+After setting up the project structure, I wrote my first Python program and successfully ran it from within the project. Although the program only displayed a simple message, it was an important milestone because it confirmed that Python was installed correctly and that I could create, save, and execute code from my own project.
+
+From there, I started learning about variables. Variables act as containers that store information which can be used later in a program. Instead of hardcoding every value directly into the code, variables make it possible to store and update information as the program runs.
+
+I then learned how to collect input from the user. This was the first time the program felt interactive rather than static. Instead of displaying the same output every time, the program could ask a question, wait for a response, and use the answer in later calculations or messages.
+
+Another important concept was data types. I learned that although two values may look similar, Python can treat them very differently. For example, the number `29` and the text `"29"` are not the same thing. One is a number that can be used in calculations, while the other is a string of characters.
+
+This naturally led to learning about type conversion. I discovered that Python can convert values between different data types when instructed to do so. Converting a string such as `"29"` into an integer allows mathematical operations to be performed on it. Understanding this helped explain why some expressions work while others produce errors.
+
+One of the most valuable habits I began developing was predicting what code would do before running it. Rather than treating programming as trial and error, I started reading code and mentally stepping through it line by line. When my prediction matched the result, it confirmed my understanding. When it did not, it revealed something new that I needed to learn.
+
+Although these concepts seem simple on their own, they form the foundation of nearly every program. User input, variables, data types, and type conversion are all ideas that will continue to appear throughout the development of the game.
+
+### Lessons Learned
+
+- Variables allow information to be stored and reused throughout a program.
+- User input makes a program interactive rather than static.
+- Numbers and text may look similar but are treated as different data types.
+- Type conversion allows values to be transformed between compatible data types.
+- Predicting code before running it is one of the fastest ways to build understanding.
+- Error messages are often useful clues rather than signs of failure.
+
+## 2026-05-30 — Breaking a Program Into Multiple Files
+
+As the project began to grow, I reached a point where keeping everything inside a single file no longer made sense. Up until then, I had mostly thought of a program as one script containing all of the code. While that works for small examples, it quickly becomes difficult to manage once different systems begin interacting with each other.
+
+To make the project more organised, I started separating responsibilities into different files. The player data was moved into `player.py`, enemy data was moved into `enemy.py`, and combat-related functionality was placed inside `combat.py`. The main game file was then responsible for bringing these pieces together.
+
+This introduced me to Python imports. Instead of defining everything in one place, I could create code in one file and use it elsewhere. At first this felt a little strange, but it quickly became clear why larger software projects are built this way. Each file has a specific purpose and can be understood independently of the others.
+
+One of the first bugs I encountered during this process was surprisingly simple. Python reported that it could not find the variables I was trying to import from another file. After checking the code several times, I eventually discovered that the problem was not the code at all—I had forgotten to save the file before running the program. Because the changes only existed in the editor and not on disk, Python was reading an older version of the file.
+
+Although the bug was minor, it taught an important lesson. Not every problem is caused by complicated code. Sometimes the issue comes from the development process itself. Learning to check simple possibilities first can save a lot of time when debugging.
+
+The most important lesson from this stage was understanding why software is divided into modules. Instead of one giant file trying to do everything, different parts of the program can focus on specific responsibilities. This makes code easier to read, easier to maintain, and easier to expand as the project grows.
+
+Looking back, this was one of the first moments where the project began to feel like real software development rather than a collection of Python exercises. The game was no longer just a script—it was becoming a system of connected components working together.
+
+### Lessons Learned
+
+- Large programs become easier to manage when responsibilities are separated into different files.
+- Imports allow code to be reused across multiple parts of a project.
+- Modules help keep related functionality organised and easier to understand.
+- Not all bugs are caused by bad code; some are caused by simple development mistakes.
+- Saving files before running a program is an important habit.
+- Breaking a project into smaller pieces makes future development much easier.
+- Software projects are often built from many connected modules rather than a single script.
+
+## 2026-05-30 — Building the First Combat System
+
+With the project structure in place and the code split across multiple files, I began building the first actual game mechanic: combat. Up until this point, the project was mostly about learning Python and organising code. Combat was the first feature that felt like a game.
+
+To represent the player and enemy, I was introduced to dictionaries. Rather than storing individual variables for every piece of information, a dictionary allows related data to be grouped together. This made it possible to store things such as health, experience points, damage, and names in a single structure.
+
+The player was given properties such as health, experience points, and damage, while the enemy was given health, damage, and an experience reward. Having both the player and enemy represented in a similar way made it easier to create systems that could work with either one.
+
+One of the first progression mechanics added to the project was experience points, or XP. Defeating an enemy would reward the player with XP, creating a simple feedback loop where success led to progression. Although the system was basic, it introduced the idea that actions within the game could permanently change the state of the player.
+
+To handle combat, I created an attack function. Instead of repeatedly writing the same damage calculations in multiple places, the logic was placed inside a reusable function. The function reduced the target's health, prevented it from dropping below zero, and returned information about the result of the attack.
+
+This was my first real exposure to the idea of reusable code. Rather than writing separate code for every attack, the same function could be used whenever one game object damaged another. The player could attack the enemy, and the enemy could attack the player using the same underlying logic.
+
+The next major concept was the combat loop. Instead of attacking once and ending the program, the game repeatedly checked whether the player and enemy were still alive. If both had health remaining, combat continued. If either reached zero health, the loop ended and the appropriate outcome was displayed.
+
+This introduced a new way of thinking about games. Rather than executing a fixed list of instructions from top to bottom, the program could repeatedly evaluate conditions and react to changing game state. Health values changed, XP increased, and the outcome depended on what happened during the loop.
+
+Looking back, this was the first time the project felt like it contained an actual gameplay system. There were now rules, consequences, progression, and state changes. The game was beginning to move beyond simple demonstrations of Python concepts and toward something interactive.
+
+### Lessons Learned
+
+- Dictionaries provide a convenient way to group related data together.
+- Player and enemy data can be represented using similar structures.
+- XP creates a simple progression system that rewards success.
+- Functions help avoid repeating the same code in multiple places.
+- Reusable code is easier to maintain and expand.
+- Loops allow game systems to continue running until specific conditions are met.
+- Game state changes over time and must be tracked by the program.
+- Combat systems are built from simple rules interacting with one another.
+
+## 2026-05-30 — Entering Game Development
+
+After building the text-based combat system, I took my first step into graphical game development by installing Pygame. Up until this point, everything had taken place in the terminal using text. While this was useful for learning programming concepts, I wanted to begin creating something visual that more closely resembled a game.
+
+Installing Pygame introduced me to the idea of external libraries. Rather than building every tool from scratch, developers can use libraries created by other programmers to solve common problems. In this case, Pygame provided everything needed to create windows, handle input, draw graphics, and build interactive applications.
+
+The first major milestone was creating a game window. Although it only displayed a blank screen, it represented a significant shift in the project. For the first time, the game existed in its own graphical space rather than inside a terminal window.
+
+I then learned about rendering, which is the process of drawing objects onto the screen. Every visual element in a game must be rendered before it can be seen by the player. Initially, the screen was simply filled with a dark background colour, but even this basic step introduced the idea that games must constantly redraw their visuals.
+
+One of the most important concepts I encountered was the game loop. Unlike a traditional script that runs from top to bottom and then exits, a game must continuously run while the player is interacting with it. The game loop repeatedly checks for input, updates the game world, and redraws the screen.
+
+At first, the game loop seemed almost invisible because very little was happening inside it. However, I quickly realised that this loop forms the foundation of nearly every game. Everything that happens during gameplay eventually becomes part of this repeating cycle.
+
+The process of creating a window, rendering graphics, and maintaining a game loop changed the way I thought about programming. Instead of writing a sequence of instructions that execute once, I was now creating a system that continuously updates itself many times every second.
+
+Looking back, the graphical output was extremely simple, but it marked a major turning point in the project. This was the moment where the project began to feel less like a collection of Python exercises and more like the beginnings of an actual game.
+
+### Lessons Learned
+
+- Pygame provides tools for creating graphical applications and games.
+- External libraries can significantly accelerate development.
+- A game window is the foundation for all graphical output.
+- Rendering is the process of drawing objects onto the screen.
+- Games constantly redraw their visuals rather than drawing them once.
+- The game loop is one of the most important concepts in game development.
+- Most games repeatedly perform three tasks: process input, update the world, and render the result.
+- Graphical game development requires a different mindset than writing terminal-based programs.
+
+## 2026-05-30 — First Player Movement
+
+After successfully creating a game window, the next goal was to place something visible on the screen and make it move. I started by drawing a simple green square. Although it was only a rectangle, it represented the first object that could eventually become a player character.
+
+To make movement possible, I needed to understand coordinates. Pygame uses a coordinate system where the top-left corner of the screen is `(0, 0)`. Moving to the right increases the x-coordinate, while moving downward increases the y-coordinate. This was slightly different from how I intuitively imagined a graph, where increasing values often move upward.
+
+Instead of drawing the square at a fixed location, I introduced position variables to store its coordinates. By keeping track of the player's x and y positions separately, the game could update those values and redraw the player in a new location.
+
+I then implemented movement using the WASD keys. Pressing A moved the player left, D moved the player right, W moved the player up, and S moved the player down. The movement itself was surprisingly simple. Rather than physically moving an object, the program simply adjusted the coordinate values being used when the player was drawn.
+
+One of the most interesting concepts I encountered was continuous input. The game was not checking whether a key had been pressed once. Instead, it was checking every frame whether a key was currently being held down. This allowed the player to move smoothly while a key remained pressed.
+
+This led to another important realization about how games work. The square was not actually moving across the screen in the way I had imagined. What was really happening was that the screen was being cleared, the coordinates were being updated, and the square was being drawn again in a slightly different position. This process repeated many times per second, creating the illusion of movement.
+
+The idea of redrawing the entire screen every frame initially seemed inefficient, but it helped me understand one of the core principles of real-time graphics. The player, enemies, backgrounds, and user interface are constantly being redrawn. The game is effectively creating a new image every frame and displaying it so quickly that it appears seamless to the player.
+
+Looking back, this was one of the most satisfying milestones so far. Seeing a shape respond to keyboard input made the project feel significantly more interactive. It was the first time I could directly control something inside the game world.
+
+### Lessons Learned
+
+- Pygame uses a coordinate system with `(0, 0)` in the top-left corner.
+- The x-coordinate controls horizontal movement.
+- The y-coordinate controls vertical movement.
+- Position variables allow objects to be moved by updating their coordinates.
+- WASD controls are implemented by checking keyboard input and adjusting position values.
+- Continuous movement comes from checking keys every frame rather than once.
+- Objects are not truly moving; they are being redrawn at different positions.
+- Real-time graphics rely on repeatedly clearing and redrawing the screen.
+- Small changes to coordinates can create the illusion of smooth movement.
+
+## 2026-05-30 — Learning Git and GitHub
+
+As the project began to take shape, I wanted a way to track changes and keep a history of my progress. This led me to Git and GitHub, two tools that are used throughout the software industry for version control and collaboration.
+
+The first step was creating a Git repository inside the project folder. Before this, my files only existed on my computer. Once the repository was created, Git began tracking changes made to the project. This meant I could see what had been modified, what was new, and what had been removed.
+
+I then created my first commit. A commit acts as a snapshot of the project at a specific point in time. Rather than simply saving files, a commit records the state of the project so it can be revisited later if needed. This introduced the idea that software development is often a series of small, incremental improvements rather than one continuous block of work.
+
+After creating local commits, I connected the project to GitHub. This allowed me to push the repository online and store a copy outside of my computer. Seeing the project appear on GitHub for the first time was an important milestone because it transformed the project from a private collection of files into something that could be shared, backed up, and developed over time.
+
+While learning Git, I encountered a common issue involving automatically generated files. Python had created cache files and macOS had created system files such as `.DS_Store`. These files were not part of the game itself, but Git tracked them because they existed inside the project folder.
+
+To solve this problem, I learned about `.gitignore`. This file tells Git which files and folders should be ignored. By adding cache files and system files to `.gitignore`, I was able to prevent unnecessary files from cluttering the repository.
+
+I also learned that adding a file to `.gitignore` does not automatically remove it from Git if it has already been committed. Because some cache files had already been tracked, I needed to explicitly remove them from version control before GitHub would stop displaying them. This was my first experience cleaning up a repository and understanding how Git manages tracked files.
+
+The most important lesson from this stage was understanding why version control exists. At first, Git seemed like an additional layer of complexity. However, I quickly realised that it provides a complete history of a project's development. Every meaningful change can be recorded, described, and revisited later. Instead of being afraid to experiment, I now have a system that allows me to make changes while maintaining a record of previous versions.
+
+Looking back, Git and GitHub felt like a completely separate skill from programming, but I can already see how important they are. Writing code is only part of software development. Managing, tracking, and preserving that code is equally important.
+
+### Lessons Learned
+
+- Git tracks changes made to files over time.
+- A repository is the container that stores a project's version history.
+- Commits act as snapshots of a project at a specific moment.
+- GitHub provides online storage and sharing for Git repositories.
+- `.gitignore` prevents unnecessary files from being tracked.
+- Cache files and operating system files should generally not be included in repositories.
+- Files already tracked by Git must be removed manually even after being added to `.gitignore`.
+- Version control makes it easier to experiment and recover from mistakes.
+- Software development involves managing code as well as writing it.
+
+
+
