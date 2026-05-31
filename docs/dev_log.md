@@ -48,3 +48,13 @@
 - Added a game clock using pygame.time.Clock()
 - Limited the game to 60 frames per second
 - Learned why game speed should not depend on computer performance
+- Added enemy health system
+- Implemented mouse-click attacks
+- Connected combat to collision detection
+- Added visual enemy health bar
+- Introduced enemy maximum health tracking
+- Added enemy death state
+- Created visual death indicators for defeated enemies
+- Added state-based enemy dialogue reactions
+- Learned how game objects transition between alive and dead states
+- Implemented delayed death effects using timers
