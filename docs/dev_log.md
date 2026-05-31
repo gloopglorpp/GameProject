@@ -17,7 +17,34 @@
 - Drew first object on screen
 - Added WASD movement controls
 - Learned Pygame coordinate system
+- Added player movement boundaries
+- Learned how coordinate constraints keep game objects inside the world
+- Replaced hardcoded boundary values with reusable screen and player size variables
+- Learned why "magic numbers" can make code harder to maintain
 - Set up Git repository
 - Connected project to GitHub
 - Added .gitignore and cleaned repository files
 - Started development journal
+
+- Added first enemy object to the game world
+- Introduced enemy position and size variables
+- Rendered multiple game objects on screen simultaneously
+- Debugged duplicate rendering code causing enemy flickering
+- Learned the importance of drawing objects once per frame
+- Learned the correct render order: clear screen → draw objects → update display
+- Created rectangle objects for collision detection
+- Learned how game objects can be represented as collision boxes
+- Implemented collision detection using Pygame's colliderect() method
+- Detected when the player and enemy overlap
+- Learned the difference between object positions and object boundaries
+- Learned how object-oriented methods can be called on Pygame objects
+- Fixed repeated collision messages by introducing collision state tracking
+- Learned the difference between continuous collision detection and one-time collision events
+- Learned how game loops repeatedly evaluate conditions every frame
+- Added temporary enemy dialogue system
+- Displayed text above game objects using Pygame fonts
+- Introduced timer-based events
+- Learned how frame-based timers work
+- Added a game clock using pygame.time.Clock()
+- Limited the game to 60 frames per second
+- Learned why game speed should not depend on computer performance
