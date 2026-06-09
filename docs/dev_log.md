@@ -138,3 +138,10 @@
 - Added fireball projectiles with glow, core, edge, and trail drawing
 - Made fireballs move through world space and collide with enemies
 - Updated controls and docs to describe fireball casting
+
+- Removed floating enemy dialogue text from combat
+- Replaced the block enemy with a simple zombie character drawing
+- Added zombie skin, clothing, face, arms, and leg details
+- Made the zombie slowly move toward the player's world position
+- Kept the enemy health bar as the main combat feedback
+- Reset the zombie ahead of the player when respawned

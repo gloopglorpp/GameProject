@@ -2,6 +2,9 @@
 [x] Display player on screen
 [x] Move player with keyboard
 [x] Spawn one enemy
+[x] Replace enemy square with zombie character
+[x] Make zombie walk slowly toward player
+[x] Remove enemy dialogue text
 [x] Attack enemy
 [x] Enemy loses health
 [x] Enemy dies

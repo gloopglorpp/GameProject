@@ -429,3 +429,22 @@ This step shows how earlier experiments still matter. The sword introduced attac
 - Layered shapes and transparency can make simple effects feel more alive.
 - Earlier experiments can lead to better design decisions later.
 
+
+## 2026-06-09 — Turning the Enemy Into a Zombie
+
+The enemy started as a simple coloured block, then gained health and reactions. At this stage, the floating dialogue above the enemy was no longer needed because the game already had a health bar and stronger visual direction. I removed the dialogue so the scene feels cleaner and less like a test screen.
+
+The enemy is now drawn as a simple zombie character. It still uses basic Pygame shapes, but it has a head, body, arms, legs, clothing, and face details. The goal was not to create finished art, but to make the enemy read more clearly as a creature in the world instead of a square target.
+
+I also gave the zombie a small amount of movement. It stores its position in world space and slowly moves toward the player's world position while it is alive. This is the first step toward enemy behaviour. The zombie does not attack yet, but it now has intent: it approaches the player.
+
+The health bar stays above the zombie because it is useful combat feedback. Instead of text reactions, the player can see progress by watching the health bar shrink and the defeated state appear. This keeps the screen quieter and makes the visuals do more of the work.
+
+### Lessons Learned
+
+- Old test feedback can be removed once better feedback exists.
+- Enemy visuals can be improved with simple shape-based drawing.
+- World-space enemies can move toward the player's world position.
+- Behaviour can be added gradually before full enemy combat.
+- Health bars can replace dialogue as combat feedback.
+

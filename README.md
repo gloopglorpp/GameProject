@@ -12,12 +12,13 @@ A small Python/Pygame game project built as a learning exercise.
 - Progresses through the world with a scrolling background
 - Uses parallax clouds, mountains, and grass highlights for movement
 - Adds gentle background motion while the game is playing
-- Spawns one enemy
+- Spawns a zombie enemy
+- Zombie slowly walks toward the player
 - Draws the player as a simple silhouette stick figure
 - Animates the player silhouette while walking and jumping
 - Draws the player as a little blue wizard with robe, hat, and staff
 - Casts glowing fireballs from the staff with left click
-- Shows enemy health and defeat state
+- Shows enemy health and defeat state without dialogue text
 
 ## Controls
 

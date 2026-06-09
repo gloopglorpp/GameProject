@@ -33,7 +33,11 @@ FIREBALL_EDGE_COLOR = (185, 38, 13)
 FIREBALL_GLOW_COLOR = (255, 126, 28, 95)
 
 ENEMY_SIZE = 50
-ENEMY_COLOR = (64, 48, 46)
+ENEMY_SPEED = 0.55
+ZOMBIE_SKIN_COLOR = (93, 128, 91)
+ZOMBIE_SHADOW_COLOR = (54, 78, 56)
+ZOMBIE_CLOTH_COLOR = (62, 71, 74)
+ZOMBIE_EYE_COLOR = (214, 230, 196)
 ENEMY_DEFEATED_COLOR = (105, 105, 105)
 
 GROUND_Y = 485
@@ -287,12 +291,27 @@ def get_fireball_rect(fireball, world_x):
     )
 
 
-def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):
+def draw_zombie(screen, enemy_rect, enemy_health, enemy_max_health, background_time):
     if enemy_health > 0:
-        pygame.draw.rect(screen, ENEMY_COLOR, enemy_rect, border_radius=6)
+        step = math.sin(background_time * 0.09)
+        head_center = (enemy_rect.centerx, enemy_rect.y + 11)
+        body_rect = pygame.Rect(enemy_rect.x + 15, enemy_rect.y + 21, 22, 24)
+        left_arm = (enemy_rect.x + 5, enemy_rect.y + 30 + step * 2)
+        right_arm = (enemy_rect.right - 5, enemy_rect.y + 30 - step * 2)
+        left_foot = (enemy_rect.centerx - 10 - step * 4, enemy_rect.bottom)
+        right_foot = (enemy_rect.centerx + 9 + step * 4, enemy_rect.bottom)
+
+        pygame.draw.line(screen, ZOMBIE_SHADOW_COLOR, (enemy_rect.centerx, enemy_rect.y + 34), left_foot, 5)
+        pygame.draw.line(screen, ZOMBIE_SHADOW_COLOR, (enemy_rect.centerx, enemy_rect.y + 34), right_foot, 5)
+        pygame.draw.rect(screen, ZOMBIE_CLOTH_COLOR, body_rect, border_radius=4)
+        pygame.draw.line(screen, ZOMBIE_SKIN_COLOR, (enemy_rect.x + 16, enemy_rect.y + 25), left_arm, 5)
+        pygame.draw.line(screen, ZOMBIE_SKIN_COLOR, (enemy_rect.right - 16, enemy_rect.y + 25), right_arm, 5)
+        pygame.draw.circle(screen, ZOMBIE_SKIN_COLOR, head_center, 10)
+        pygame.draw.circle(screen, ZOMBIE_SHADOW_COLOR, (head_center[0] - 4, head_center[1] + 2), 2)
+        pygame.draw.circle(screen, ZOMBIE_EYE_COLOR, (head_center[0] + 4, head_center[1] - 2), 2)
+        pygame.draw.line(screen, ZOMBIE_SHADOW_COLOR, (head_center[0] - 3, head_center[1] + 7), (head_center[0] + 6, head_center[1] + 5), 2)
     else:
         pygame.draw.rect(screen, ENEMY_DEFEATED_COLOR, enemy_rect, border_radius=6)
-
         pygame.draw.line(
             screen,
             TEXT_COLOR,
@@ -341,8 +360,6 @@ def run_game(max_frames=None):
 
     enemy_max_health = 3
     enemy_health = enemy_max_health
-    enemy_text = ""
-    enemy_text_timer = 0
     player_y_velocity = 0
     player_facing = 1
     player_animation_frame = 0
@@ -373,8 +390,7 @@ def run_game(max_frames=None):
                         jump_pressed = True
                     elif event.key == pygame.K_r and enemy_health == 0:
                         enemy_health = enemy_max_health
-                        enemy_text = "Back for more!"
-                        enemy_text_timer = 60
+                        enemy_world_x = world_x + 500
                 elif game_state == "paused":
                     if event.key == pygame.K_ESCAPE:
                         game_state = "playing"
@@ -410,6 +426,11 @@ def run_game(max_frames=None):
 
         if game_state == "playing":
             background_time += 1
+            if enemy_health > 0:
+                if enemy_world_x > world_x + 42:
+                    enemy_world_x -= ENEMY_SPEED
+                elif enemy_world_x < world_x - 42:
+                    enemy_world_x += ENEMY_SPEED
             enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
             keys = pygame.key.get_pressed()
             player_is_moving = False
@@ -461,20 +482,8 @@ def run_game(max_frames=None):
                 if fireball_rect.colliderect(enemy_rect) and enemy_health > 0:
                     enemy_health = max(enemy_health - 1, 0)
                     fireballs.remove(fireball)
-
-                    if enemy_health == 2:
-                        enemy_text = "???"
-                    elif enemy_health == 1:
-                        enemy_text = "HOT!!"
-                    else:
-                        enemy_text = "Defeated!"
-
-                    enemy_text_timer = 60
                 elif fireball["age"] > FIREBALL_LIFETIME:
                     fireballs.remove(fireball)
-
-            if enemy_text_timer > 0:
-                enemy_text_timer -= 1
 
         enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
 
@@ -494,10 +503,7 @@ def run_game(max_frames=None):
             background_time,
         )
         if -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
-            draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
-
-        if enemy_text_timer > 0:
-            draw_text(screen, font, enemy_text, enemy_rect.x, enemy_rect.y - 45)
+            draw_zombie(screen, enemy_rect, enemy_health, enemy_max_health, background_time)
 
         if game_state == "paused":
             pause_buttons = draw_pause_menu(screen, title_font, font, selected_pause_option)
