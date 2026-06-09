@@ -448,3 +448,22 @@ The health bar stays above the zombie because it is useful combat feedback. Inst
 - Behaviour can be added gradually before full enemy combat.
 - Health bars can replace dialogue as combat feedback.
 
+
+## 2026-06-09 — Adding Zombie Death Effects and Natural Respawn
+
+The zombie death state previously ended with the enemy simply disappearing or needing a manual respawn. That worked while testing, but it felt artificial. The next step was to make enemy death feel like part of the world by adding flame and smoke effects, then letting the next zombie arrive naturally from off-screen.
+
+I added a particle system for zombie deaths. When a zombie reaches zero health, the game creates a group of small particles at the zombie's position. Some particles act like flame, moving quickly upward and shrinking as they fade. Other particles act like smoke, rising more slowly, spreading out, and becoming transparent over time.
+
+There are multiple death effect patterns: a taller flame pillar, a wider burst, and a swirling version. Each one uses random sizes, speeds, colours, and lifetimes so the effect does not look exactly the same every time. This makes repeated combat feel less mechanical.
+
+The manual respawn key was removed. Instead, the game waits for the death effect to finish and then respawns the zombie ahead of the player, off-screen. This avoids the strange feeling of an enemy suddenly appearing in view. It also makes the world feel more continuous because new enemies enter from beyond the edge of the screen.
+
+### Lessons Learned
+
+- Particle effects can make simple shape-based games feel more alive.
+- Random variation helps repeated effects feel less boring.
+- Fire and smoke can use different movement, size, and fade rules.
+- Respawning enemies off-screen prevents visible pop-in.
+- Automatic respawn can replace a testing shortcut once the game loop feels stronger.
+

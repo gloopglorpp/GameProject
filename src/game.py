@@ -1,4 +1,5 @@
 import math
+import random
 
 import pygame
 
@@ -38,7 +39,20 @@ ZOMBIE_SKIN_COLOR = (93, 128, 91)
 ZOMBIE_SHADOW_COLOR = (54, 78, 56)
 ZOMBIE_CLOTH_COLOR = (62, 71, 74)
 ZOMBIE_EYE_COLOR = (214, 230, 196)
-ENEMY_DEFEATED_COLOR = (105, 105, 105)
+ENEMY_DEATH_RESPAWN_DELAY = 150
+ENEMY_RESPAWN_DISTANCE_MIN = 860
+ENEMY_RESPAWN_DISTANCE_MAX = 1180
+FLAME_COLORS = [
+    (255, 231, 132),
+    (255, 155, 48),
+    (222, 68, 24),
+    (135, 36, 23),
+]
+SMOKE_COLORS = [
+    (42, 43, 40),
+    (78, 80, 76),
+    (120, 122, 116),
+]
 
 GROUND_Y = 485
 
@@ -190,7 +204,6 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
         "A / D: move",
         "Space: jump",
         "Left click: cast fireball",
-        "R: respawn defeated enemy",
         "Esc: pause or return",
     ]
 
@@ -311,21 +324,7 @@ def draw_zombie(screen, enemy_rect, enemy_health, enemy_max_health, background_t
         pygame.draw.circle(screen, ZOMBIE_EYE_COLOR, (head_center[0] + 4, head_center[1] - 2), 2)
         pygame.draw.line(screen, ZOMBIE_SHADOW_COLOR, (head_center[0] - 3, head_center[1] + 7), (head_center[0] + 6, head_center[1] + 5), 2)
     else:
-        pygame.draw.rect(screen, ENEMY_DEFEATED_COLOR, enemy_rect, border_radius=6)
-        pygame.draw.line(
-            screen,
-            TEXT_COLOR,
-            (enemy_rect.x + 12, enemy_rect.y + 12),
-            (enemy_rect.x + ENEMY_SIZE - 12, enemy_rect.y + ENEMY_SIZE - 12),
-            3,
-        )
-        pygame.draw.line(
-            screen,
-            TEXT_COLOR,
-            (enemy_rect.x + ENEMY_SIZE - 12, enemy_rect.y + 12),
-            (enemy_rect.x + 12, enemy_rect.y + ENEMY_SIZE - 12),
-            3,
-        )
+        return
 
     health_bar_width = ENEMY_SIZE
     pygame.draw.rect(
@@ -344,6 +343,95 @@ def draw_zombie(screen, enemy_rect, enemy_health, enemy_max_health, background_t
     )
 
 
+def create_enemy_death_effect(enemy_rect, world_x):
+    effect_variants = ["pillar", "burst", "spiral"]
+    variant = random.choice(effect_variants)
+    particles = []
+    origin_x = world_x + enemy_rect.centerx - PLAYER_SCREEN_X
+    origin_y = enemy_rect.centery
+
+    if variant == "pillar":
+        flame_count = 24
+        smoke_count = 20
+        flame_spread = 12
+    elif variant == "burst":
+        flame_count = 34
+        smoke_count = 14
+        flame_spread = 26
+    else:
+        flame_count = 28
+        smoke_count = 24
+        flame_spread = 18
+
+    for index in range(flame_count):
+        angle = random.uniform(-math.pi * 0.95, -math.pi * 0.05)
+        speed = random.uniform(1.4, 4.2)
+        swirl = math.sin(index * 0.8) * 1.2 if variant == "spiral" else 0
+        particles.append({
+            "kind": "flame",
+            "x": origin_x + random.uniform(-flame_spread, flame_spread),
+            "y": origin_y + random.uniform(-18, 18),
+            "vx": math.cos(angle) * speed + swirl,
+            "vy": math.sin(angle) * speed - random.uniform(0.4, 1.5),
+            "radius": random.uniform(4, 10),
+            "age": 0,
+            "life": random.randint(28, 52),
+            "color": random.choice(FLAME_COLORS),
+        })
+
+    for _ in range(smoke_count):
+        particles.append({
+            "kind": "smoke",
+            "x": origin_x + random.uniform(-18, 18),
+            "y": origin_y + random.uniform(-18, 12),
+            "vx": random.uniform(-0.65, 0.65),
+            "vy": random.uniform(-1.5, -0.35),
+            "radius": random.uniform(8, 17),
+            "age": 0,
+            "life": random.randint(70, 120),
+            "color": random.choice(SMOKE_COLORS),
+        })
+
+    return particles
+
+
+def update_death_particles(particles):
+    for particle in particles[:]:
+        particle["age"] += 1
+        particle["x"] += particle["vx"]
+        particle["y"] += particle["vy"]
+
+        if particle["kind"] == "flame":
+            particle["vy"] -= 0.02
+            particle["radius"] *= 0.965
+        else:
+            particle["vy"] -= 0.005
+            particle["vx"] *= 0.99
+            particle["radius"] *= 1.01
+
+        if particle["age"] >= particle["life"] or particle["radius"] < 0.8:
+            particles.remove(particle)
+
+
+def draw_death_particles(screen, particles, world_x):
+    for particle in particles:
+        progress = particle["age"] / particle["life"]
+        alpha = max(0, int(210 * (1 - progress)))
+        if particle["kind"] == "smoke":
+            alpha = max(0, int(125 * (1 - progress)))
+
+        screen_x = int(particle["x"] - world_x + PLAYER_SCREEN_X)
+        y = int(particle["y"])
+        radius = max(1, int(particle["radius"]))
+        surface = pygame.Surface((radius * 2 + 4, radius * 2 + 4), pygame.SRCALPHA)
+        pygame.draw.circle(surface, (*particle["color"], alpha), (radius + 2, radius + 2), radius)
+        screen.blit(surface, (screen_x - radius - 2, y - radius - 2))
+
+
+def respawn_enemy(world_x):
+    return world_x + random.randint(ENEMY_RESPAWN_DISTANCE_MIN, ENEMY_RESPAWN_DISTANCE_MAX)
+
+
 def run_game(max_frames=None):
     pygame.init()
 
@@ -360,6 +448,8 @@ def run_game(max_frames=None):
 
     enemy_max_health = 3
     enemy_health = enemy_max_health
+    enemy_respawn_timer = 0
+    death_particles = []
     player_y_velocity = 0
     player_facing = 1
     player_animation_frame = 0
@@ -388,9 +478,6 @@ def run_game(max_frames=None):
                         game_state = "paused"
                     elif event.key == pygame.K_SPACE:
                         jump_pressed = True
-                    elif event.key == pygame.K_r and enemy_health == 0:
-                        enemy_health = enemy_max_health
-                        enemy_world_x = world_x + 500
                 elif game_state == "paused":
                     if event.key == pygame.K_ESCAPE:
                         game_state = "playing"
@@ -426,6 +513,14 @@ def run_game(max_frames=None):
 
         if game_state == "playing":
             background_time += 1
+            update_death_particles(death_particles)
+
+            if enemy_health == 0:
+                enemy_respawn_timer -= 1
+                if enemy_respawn_timer <= 0 and not death_particles:
+                    enemy_health = enemy_max_health
+                    enemy_world_x = respawn_enemy(world_x)
+
             if enemy_health > 0:
                 if enemy_world_x > world_x + 42:
                     enemy_world_x -= ENEMY_SPEED
@@ -482,12 +577,18 @@ def run_game(max_frames=None):
                 if fireball_rect.colliderect(enemy_rect) and enemy_health > 0:
                     enemy_health = max(enemy_health - 1, 0)
                     fireballs.remove(fireball)
+
+                    if enemy_health == 0:
+                        death_particles.extend(create_enemy_death_effect(enemy_rect, world_x))
+                        enemy_respawn_timer = ENEMY_DEATH_RESPAWN_DELAY
                 elif fireball["age"] > FIREBALL_LIFETIME:
                     fireballs.remove(fireball)
 
         enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
 
         draw_background(screen, world_x, background_time)
+
+        draw_death_particles(screen, death_particles, world_x)
 
         for fireball in fireballs:
             draw_fireball(screen, fireball, world_x)
@@ -502,7 +603,7 @@ def run_game(max_frames=None):
             player_is_jumping,
             background_time,
         )
-        if -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
+        if enemy_health > 0 and -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
             draw_zombie(screen, enemy_rect, enemy_health, enemy_max_health, background_time)
 
         if game_state == "paused":

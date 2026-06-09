@@ -19,6 +19,8 @@ A small Python/Pygame game project built as a learning exercise.
 - Draws the player as a little blue wizard with robe, hat, and staff
 - Casts glowing fireballs from the staff with left click
 - Shows enemy health and defeat state without dialogue text
+- Plays varied flame and smoke death effects when zombies die
+- Automatically respawns zombies off-screen
 
 ## Controls
 
@@ -26,7 +28,6 @@ A small Python/Pygame game project built as a learning exercise.
 - D = move right
 - Space = jump
 - Left click = cast fireball
-- R = respawn defeated enemy
 - Esc = pause menu
 
 ## Pause Menu

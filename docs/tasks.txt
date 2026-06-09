@@ -8,6 +8,9 @@
 [x] Attack enemy
 [x] Enemy loses health
 [x] Enemy dies
+[x] Add varied zombie flame and smoke death effects
+[x] Add automatic off-screen zombie respawn
+[x] Remove manual respawn button
 [x] Add simple sky and mountain background
 [x] Add grass ground line
 [x] Keep characters fixed to the ground

@@ -145,3 +145,10 @@
 - Made the zombie slowly move toward the player's world position
 - Kept the enemy health bar as the main combat feedback
 - Reset the zombie ahead of the player when respawned
+
+- Added varied zombie death effects using flame and smoke particles
+- Created multiple death effect patterns so defeats do not look identical
+- Made particles rise, fade, shrink, or expand over time
+- Removed the manual R respawn control
+- Added automatic zombie respawn after the death effect clears
+- Respawned zombies off-screen ahead of the player to avoid visible pop-in
