@@ -81,3 +81,12 @@
 - Positioned the player and enemy so their feet sit on the ground
 - Changed player movement from free movement to left/right ground movement
 - Learned how background layers can suggest atmosphere before adding detailed art assets
+
+- Added a basic jump using upward velocity and gravity
+- Kept the player landing on the shared ground line
+- Changed Escape from quitting immediately to opening a pause menu
+- Added Resume, Controls, and Quit pause menu options
+- Added keyboard navigation for the pause menu
+- Added mouse clicking for pause menu buttons
+- Moved gameplay controls off the main screen and into the Controls menu
+- Learned how a game state can pause gameplay updates while still drawing the scene

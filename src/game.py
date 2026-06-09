@@ -7,6 +7,8 @@ FPS = 60
 
 PLAYER_SIZE = 50
 PLAYER_SPEED = 5
+JUMP_STRENGTH = -16
+GRAVITY = 1
 PLAYER_COLOR = (35, 46, 42)
 
 ENEMY_SIZE = 50
@@ -23,6 +25,10 @@ GROUND_COLOR = (51, 65, 54)
 GROUND_SHADOW_COLOR = (35, 42, 36)
 TEXT_COLOR = (235, 238, 245)
 MUTED_TEXT_COLOR = (155, 165, 180)
+MENU_OVERLAY_COLOR = (12, 16, 18, 175)
+MENU_PANEL_COLOR = (34, 42, 43)
+MENU_SELECTED_COLOR = (92, 121, 105)
+PAUSE_OPTIONS = ["Resume", "Controls", "Quit"]
 
 
 def draw_text(screen, font, text, x, y, color=TEXT_COLOR):
@@ -76,6 +82,71 @@ def draw_background(screen):
     pygame.draw.rect(screen, GROUND_SHADOW_COLOR, (0, GROUND_Y + 50, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y))
 
 
+def get_pause_buttons():
+    buttons = []
+    for index, label in enumerate(PAUSE_OPTIONS):
+        rect = pygame.Rect(SCREEN_WIDTH // 2 - 110, 245 + index * 65, 220, 45)
+        buttons.append((label, rect))
+    return buttons
+
+
+def get_controls_back_button():
+    return pygame.Rect(SCREEN_WIDTH // 2 - 110, 420, 220, 45)
+
+
+def draw_menu_button(screen, font, text, rect, selected=False):
+    color = MENU_SELECTED_COLOR if selected else MENU_PANEL_COLOR
+    pygame.draw.rect(screen, color, rect, border_radius=6)
+    pygame.draw.rect(screen, TEXT_COLOR, rect, 2, border_radius=6)
+
+    text_surface = font.render(text, True, TEXT_COLOR)
+    text_rect = text_surface.get_rect(center=rect.center)
+    screen.blit(text_surface, text_rect)
+
+
+def draw_pause_menu(screen, title_font, button_font, selected_option):
+    overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    overlay.fill(MENU_OVERLAY_COLOR)
+    screen.blit(overlay, (0, 0))
+
+    title_surface = title_font.render("Paused", True, TEXT_COLOR)
+    title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 180))
+    screen.blit(title_surface, title_rect)
+
+    buttons = get_pause_buttons()
+    for index, (label, rect) in enumerate(buttons):
+        draw_menu_button(screen, button_font, label, rect, selected_option == index)
+
+    return buttons
+
+
+def draw_controls_menu(screen, title_font, button_font, small_font):
+    overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    overlay.fill(MENU_OVERLAY_COLOR)
+    screen.blit(overlay, (0, 0))
+
+    title_surface = title_font.render("Controls", True, TEXT_COLOR)
+    title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 150))
+    screen.blit(title_surface, title_rect)
+
+    controls = [
+        "A / D: move",
+        "W / Up: jump",
+        "Space / left click: attack while touching enemy",
+        "R: respawn defeated enemy",
+        "Esc: pause or return",
+    ]
+
+    for index, line in enumerate(controls):
+        text_surface = small_font.render(line, True, TEXT_COLOR)
+        text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 220 + index * 32))
+        screen.blit(text_surface, text_rect)
+
+    back_rect = get_controls_back_button()
+    draw_menu_button(screen, button_font, "Back", back_rect, True)
+    return back_rect
+
+
 def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):
     if enemy_health > 0:
         pygame.draw.rect(screen, ENEMY_COLOR, enemy_rect, border_radius=6)
@@ -121,6 +192,7 @@ def run_game(max_frames=None):
     pygame.display.set_caption("GameProject")
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 32)
+    title_font = pygame.font.Font(None, 56)
     small_font = pygame.font.Font(None, 24)
 
     player_rect = pygame.Rect(100, GROUND_Y - PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE)
@@ -130,51 +202,98 @@ def run_game(max_frames=None):
     enemy_health = enemy_max_health
     enemy_text = ""
     enemy_text_timer = 0
+    player_y_velocity = 0
+    selected_pause_option = 0
+    game_state = "playing"
     frames_run = 0
     running = True
 
     while running:
         attack_pressed = False
-
+        jump_pressed = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                elif event.key == pygame.K_SPACE:
-                    attack_pressed = True
-                elif event.key == pygame.K_r and enemy_health == 0:
-                    enemy_health = enemy_max_health
-                    enemy_text = "Back for more!"
-                    enemy_text_timer = 60
+                if game_state == "playing":
+                    if event.key == pygame.K_ESCAPE:
+                        game_state = "paused"
+                    elif event.key in (pygame.K_w, pygame.K_UP):
+                        jump_pressed = True
+                    elif event.key == pygame.K_SPACE:
+                        attack_pressed = True
+                    elif event.key == pygame.K_r and enemy_health == 0:
+                        enemy_health = enemy_max_health
+                        enemy_text = "Back for more!"
+                        enemy_text_timer = 60
+                elif game_state == "paused":
+                    if event.key == pygame.K_ESCAPE:
+                        game_state = "playing"
+                    elif event.key in (pygame.K_w, pygame.K_UP):
+                        selected_pause_option = (selected_pause_option - 1) % 3
+                    elif event.key in (pygame.K_s, pygame.K_DOWN):
+                        selected_pause_option = (selected_pause_option + 1) % 3
+                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                        if selected_pause_option == 0:
+                            game_state = "playing"
+                        elif selected_pause_option == 1:
+                            game_state = "controls"
+                        else:
+                            running = False
+                elif game_state == "controls":
+                    if event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
+                        game_state = "paused"
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                attack_pressed = True
+                if game_state == "playing":
+                    attack_pressed = True
+                elif game_state == "paused":
+                    for index, (_, rect) in enumerate(get_pause_buttons()):
+                        if rect.collidepoint(event.pos):
+                            if index == 0:
+                                game_state = "playing"
+                            elif index == 1:
+                                game_state = "controls"
+                            else:
+                                running = False
+                elif game_state == "controls":
+                    if get_controls_back_button().collidepoint(event.pos):
+                        game_state = "paused"
 
-        keys = pygame.key.get_pressed()
+        if game_state == "playing":
+            keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_a]:
-            player_rect.x -= PLAYER_SPEED
-        if keys[pygame.K_d]:
-            player_rect.x += PLAYER_SPEED
-        player_rect.clamp_ip(screen.get_rect())
-        player_rect.bottom = GROUND_Y
+            if keys[pygame.K_a]:
+                player_rect.x -= PLAYER_SPEED
+            if keys[pygame.K_d]:
+                player_rect.x += PLAYER_SPEED
 
-        touching_enemy = player_rect.colliderect(enemy_rect)
-        if attack_pressed and touching_enemy and enemy_health > 0:
-            enemy_health = max(enemy_health - 1, 0)
+            player_rect.x = max(0, min(player_rect.x, SCREEN_WIDTH - PLAYER_SIZE))
 
-            if enemy_health == 2:
-                enemy_text = "???"
-            elif enemy_health == 1:
-                enemy_text = "OUCH!!"
-            else:
-                enemy_text = "Defeated!"
+            if jump_pressed and player_rect.bottom == GROUND_Y:
+                player_y_velocity = JUMP_STRENGTH
 
-            enemy_text_timer = 60
+            player_y_velocity += GRAVITY
+            player_rect.y += player_y_velocity
 
-        if enemy_text_timer > 0:
-            enemy_text_timer -= 1
+            if player_rect.bottom >= GROUND_Y:
+                player_rect.bottom = GROUND_Y
+                player_y_velocity = 0
+
+            touching_enemy = player_rect.colliderect(enemy_rect)
+            if attack_pressed and touching_enemy and enemy_health > 0:
+                enemy_health = max(enemy_health - 1, 0)
+
+                if enemy_health == 2:
+                    enemy_text = "???"
+                elif enemy_health == 1:
+                    enemy_text = "OUCH!!"
+                else:
+                    enemy_text = "Defeated!"
+
+                enemy_text_timer = 60
+
+            if enemy_text_timer > 0:
+                enemy_text_timer -= 1
 
         draw_background(screen)
 
@@ -184,11 +303,10 @@ def run_game(max_frames=None):
         if enemy_text_timer > 0:
             draw_text(screen, font, enemy_text, enemy_rect.x, enemy_rect.y - 45)
 
-        draw_text(screen, small_font, "A/D move", 20, 20, MUTED_TEXT_COLOR)
-        draw_text(screen, small_font, "Space/click attack while touching", 20, 45, MUTED_TEXT_COLOR)
-
-        if enemy_health == 0:
-            draw_text(screen, small_font, "Press R to respawn the enemy", 20, 70, MUTED_TEXT_COLOR)
+        if game_state == "paused":
+            pause_buttons = draw_pause_menu(screen, title_font, font, selected_pause_option)
+        elif game_state == "controls":
+            controls_back_button = draw_controls_menu(screen, title_font, font, small_font)
 
         pygame.display.flip()
         clock.tick(FPS)

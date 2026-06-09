@@ -254,3 +254,26 @@ This step also helped separate two different ideas: background visuals and gamep
 - It is better to add jumping later as its own clear mechanic.
 - Visual polish can be introduced gradually without making the project harder to understand.
 
+
+## 2026-06-09 — Adding Jump and a Pause Menu
+
+After fixing the characters to the ground, the next natural movement feature was jumping. This was a good step because it builds directly on the ground line from the previous milestone. The player already had a clear place to stand, so jumping could be added as movement away from that line and then back down to it.
+
+The jump uses two simple ideas: upward velocity and gravity. When the jump key is pressed while the player is on the ground, the player receives an upward velocity. Each frame, gravity pulls that velocity back down. When the bottom of the player reaches `GROUND_Y`, the player is placed back on the ground and the vertical velocity is reset.
+
+I also added a pause menu. Before this, Escape immediately quit the game. That worked for testing, but it was not very game-like and it meant control hints had to stay on the main screen. Now Escape opens a pause state instead. The menu has Resume, Controls, and Quit options. This makes the game screen cleaner because the controls can live inside the menu instead of being drawn over the world all the time.
+
+The pause menu introduced the idea of game states. When the game is in the playing state, movement, jumping, attacking, and enemy text timers update normally. When the game is paused, those gameplay updates stop, but the scene still draws behind the menu. This means the pause screen feels connected to the game world rather than replacing it completely.
+
+This was also the first step toward proper interface controls. The pause menu can be used with the keyboard, and the buttons can also be clicked with the mouse. The actual layout is still simple, but the important idea is that menus are part of the game logic too.
+
+### Lessons Learned
+
+- Jumping can be built from velocity and gravity.
+- A player should only start a jump when they are on the ground.
+- Gravity can be applied every frame to pull the player back down.
+- A pause menu needs its own game state.
+- Pausing should stop gameplay updates without needing to stop drawing the screen.
+- Moving controls into a menu keeps the main play screen cleaner.
+- Menu buttons need shared positions so drawing and clicking use the same rectangles.
+
