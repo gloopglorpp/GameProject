@@ -110,3 +110,12 @@
 - Kept the existing player collision rectangle for movement and combat
 - Reattached the sword to the stick figure's front hand
 - Learned how visual drawing can change without changing the underlying hitbox
+
+- Added a world_x value to track progress through the world
+- Kept the player near a fixed screen position while the world moves
+- Made the enemy use a world position so it appears as the player progresses
+- Added moving cloud layers for atmosphere
+- Added background_time so parts of the background move even while standing still
+- Added parallax mountain movement for background depth
+- Added repeating grass highlights to make the ground feel alive
+- Learned the difference between screen position and world position

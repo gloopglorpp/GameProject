@@ -4,6 +4,7 @@ import pygame
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 60
+PLAYER_SCREEN_X = 160
 
 PLAYER_SIZE = 50
 PLAYER_SPEED = 5
@@ -30,6 +31,8 @@ MOUNTAIN_NEAR_COLOR = (72, 88, 91, 130)
 GRASS_COLOR = (86, 122, 74)
 GROUND_COLOR = (51, 65, 54)
 GROUND_SHADOW_COLOR = (35, 42, 36)
+CLOUD_COLOR = (224, 229, 222, 90)
+GRASS_HIGHLIGHT_COLOR = (112, 148, 87)
 TEXT_COLOR = (235, 238, 245)
 MUTED_TEXT_COLOR = (155, 165, 180)
 MENU_OVERLAY_COLOR = (12, 16, 18, 175)
@@ -43,48 +46,78 @@ def draw_text(screen, font, text, x, y, color=TEXT_COLOR):
     screen.blit(text_surface, (x, y))
 
 
-def draw_mountains(screen, points, color):
-    mountain_layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+def draw_mountains(screen, points, color, offset_x):
+    mountain_layer = pygame.Surface((SCREEN_WIDTH * 2, SCREEN_HEIGHT), pygame.SRCALPHA)
     pygame.draw.polygon(mountain_layer, color, points)
-    screen.blit(mountain_layer, (0, 0))
+    pygame.draw.polygon(mountain_layer, color, [(x + SCREEN_WIDTH, y) for x, y in points])
+    screen.blit(mountain_layer, (-offset_x, 0))
 
 
-def draw_background(screen):
+def draw_clouds(screen, world_x, background_time):
+    cloud_layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    cloud_positions = [
+        (120, 95, 58, 15, 0.08),
+        (360, 130, 78, 18, 0.12),
+        (620, 80, 64, 14, 0.1),
+    ]
+
+    for base_x, y, width, height, speed in cloud_positions:
+        x = (base_x - world_x * speed - background_time * speed * 0.4) % (SCREEN_WIDTH + width) - width
+        pygame.draw.ellipse(cloud_layer, CLOUD_COLOR, (x, y, width, height))
+        pygame.draw.ellipse(cloud_layer, CLOUD_COLOR, (x + width * 0.3, y - 8, width * 0.5, height * 1.4))
+
+    screen.blit(cloud_layer, (0, 0))
+
+
+def draw_grass_highlights(screen, world_x, background_time):
+    for index in range(18):
+        x = (index * 55 - world_x * 0.9) % (SCREEN_WIDTH + 60) - 30
+        height = 7 + (index + background_time // 15) % 4
+        pygame.draw.line(
+            screen,
+            GRASS_HIGHLIGHT_COLOR,
+            (x, GROUND_Y + 17),
+            (x + 9, GROUND_Y + 17 - height),
+            2,
+        )
+
+
+def draw_background(screen, world_x, background_time):
     screen.fill(SKY_COLOR)
+    draw_clouds(screen, world_x, background_time)
 
-    draw_mountains(
-        screen,
-        [
-            (0, GROUND_Y),
-            (0, 250),
-            (120, 170),
-            (260, 285),
-            (390, 155),
-            (570, 305),
-            (700, 205),
-            (SCREEN_WIDTH, 270),
-            (SCREEN_WIDTH, GROUND_Y),
-        ],
-        MOUNTAIN_FAR_COLOR,
-    )
+    far_offset = int(world_x * 0.15) % SCREEN_WIDTH
+    near_offset = int(world_x * 0.35) % SCREEN_WIDTH
 
-    draw_mountains(
-        screen,
-        [
-            (0, GROUND_Y),
-            (0, 335),
-            (110, 260),
-            (210, 345),
-            (340, 235),
-            (475, 355),
-            (615, 245),
-            (SCREEN_WIDTH, 350),
-            (SCREEN_WIDTH, GROUND_Y),
-        ],
-        MOUNTAIN_NEAR_COLOR,
-    )
+    far_mountains = [
+        (0, GROUND_Y),
+        (0, 250),
+        (120, 170),
+        (260, 285),
+        (390, 155),
+        (570, 305),
+        (700, 205),
+        (SCREEN_WIDTH, 270),
+        (SCREEN_WIDTH, GROUND_Y),
+    ]
+
+    near_mountains = [
+        (0, GROUND_Y),
+        (0, 335),
+        (110, 260),
+        (210, 345),
+        (340, 235),
+        (475, 355),
+        (615, 245),
+        (SCREEN_WIDTH, 350),
+        (SCREEN_WIDTH, GROUND_Y),
+    ]
+
+    draw_mountains(screen, far_mountains, MOUNTAIN_FAR_COLOR, far_offset)
+    draw_mountains(screen, near_mountains, MOUNTAIN_NEAR_COLOR, near_offset)
 
     pygame.draw.rect(screen, GRASS_COLOR, (0, GROUND_Y, SCREEN_WIDTH, 18))
+    draw_grass_highlights(screen, world_x, background_time)
     pygame.draw.rect(screen, GROUND_COLOR, (0, GROUND_Y + 18, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y))
     pygame.draw.rect(screen, GROUND_SHADOW_COLOR, (0, GROUND_Y + 50, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y))
 
@@ -235,8 +268,9 @@ def run_game(max_frames=None):
     title_font = pygame.font.Font(None, 56)
     small_font = pygame.font.Font(None, 24)
 
-    player_rect = pygame.Rect(100, GROUND_Y - PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE)
-    enemy_rect = pygame.Rect(500, GROUND_Y - ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE)
+    player_rect = pygame.Rect(PLAYER_SCREEN_X, GROUND_Y - PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE)
+    enemy_world_x = 500
+    enemy_rect = pygame.Rect(enemy_world_x, GROUND_Y - ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE)
 
     enemy_max_health = 3
     enemy_health = enemy_max_health
@@ -244,6 +278,8 @@ def run_game(max_frames=None):
     enemy_text_timer = 0
     player_y_velocity = 0
     player_facing = 1
+    world_x = 0
+    background_time = 0
     selected_pause_option = 0
     game_state = "playing"
     frames_run = 0
@@ -303,16 +339,18 @@ def run_game(max_frames=None):
                         game_state = "paused"
 
         if game_state == "playing":
+            background_time += 1
+            enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
             keys = pygame.key.get_pressed()
 
             if keys[pygame.K_a]:
-                player_rect.x -= PLAYER_SPEED
+                world_x = max(0, world_x - PLAYER_SPEED)
                 player_facing = -1
             if keys[pygame.K_d]:
-                player_rect.x += PLAYER_SPEED
+                world_x += PLAYER_SPEED
                 player_facing = 1
 
-            player_rect.x = max(0, min(player_rect.x, SCREEN_WIDTH - PLAYER_SIZE))
+            player_rect.x = PLAYER_SCREEN_X
 
             if jump_pressed and player_rect.bottom == GROUND_Y:
                 player_y_velocity = JUMP_STRENGTH
@@ -340,10 +378,13 @@ def run_game(max_frames=None):
             if enemy_text_timer > 0:
                 enemy_text_timer -= 1
 
-        draw_background(screen)
+        enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
+
+        draw_background(screen, world_x, background_time)
 
         draw_player(screen, player_rect, player_facing)
-        draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
+        if -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
+            draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
 
         if enemy_text_timer > 0:
             draw_text(screen, font, enemy_text, enemy_rect.x, enemy_rect.y - 45)

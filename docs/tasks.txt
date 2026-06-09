@@ -8,6 +8,8 @@
 [x] Add simple sky and mountain background
 [x] Add grass ground line
 [x] Keep characters fixed to the ground
+[x] Add scrolling world progression
+[x] Add moving parallax background layers
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu

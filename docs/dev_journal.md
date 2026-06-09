@@ -346,3 +346,26 @@ The sword is now drawn from the front hand of the figure. It still uses the same
 - Keeping the hitbox stable avoids breaking movement and combat while improving visuals.
 - Small visual upgrades can make existing mechanics feel more intentional.
 
+
+## 2026-06-09 — Adding World Progression
+
+After the player had a clearer silhouette and sword, the next step was to make the world feel larger than one static screen. Instead of creating a full level system all at once, I added a single value called `world_x`. This value represents how far the player has travelled through the world.
+
+The player now stays near a fixed position on the screen while movement changes `world_x`. This creates the feeling of travelling through the scene because the background and world objects move relative to that progress value. It also introduces an important game development idea: screen position and world position are not always the same thing.
+
+The enemy now has a world position too. Its screen position is calculated from its world position and the player's current progress. This means the enemy can exist in the world ahead of the player, then appear on screen as the player moves forward.
+
+I also made the background feel more alive. Clouds drift slowly, distant mountains move more slowly than closer mountains, and small grass highlights repeat along the ground. I also added a `background_time` value so some of the background motion can continue while the game is playing, even if the player is not currently moving. This is called parallax movement. It creates a sense of depth because far-away things move less than nearby things.
+
+This step still keeps the art simple. The background is made from shapes, not image files, but the scene now feels more like a living place. It is a good foundation for later adding proper levels, more enemies, and background art assets.
+
+### Lessons Learned
+
+- A scrolling world can start with one progress value.
+- Screen position is where something is drawn on the window.
+- World position is where something exists in the larger game world.
+- Parallax makes far-away layers move slower than nearby layers.
+- Small moving details can make a background feel more alive.
+- Time-based animation and movement-based scrolling can work together.
+- World progression can be added before building a full level system.
+

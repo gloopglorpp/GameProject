@@ -9,6 +9,9 @@ A small Python/Pygame game project built as a learning exercise.
 - Moves the player left and right along the ground
 - Lets the player jump with simple gravity
 - Draws a faded sky, mountain, and grass background
+- Progresses through the world with a scrolling background
+- Uses parallax clouds, mountains, and grass highlights for movement
+- Adds gentle background motion while the game is playing
 - Spawns one enemy
 - Draws the player as a simple silhouette stick figure
 - Draws a simple sword attached to the player
