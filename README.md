@@ -10,7 +10,8 @@ A small Python/Pygame game project built as a learning exercise.
 - Lets the player jump with simple gravity
 - Draws a faded sky, mountain, and grass background
 - Spawns one enemy
-- Attacks the enemy with left click while touching it
+- Draws a simple sword attached to the player
+- Attacks the enemy with the sword using left click
 - Shows enemy health and defeat state
 
 ## Controls
@@ -18,7 +19,7 @@ A small Python/Pygame game project built as a learning exercise.
 - A = move left
 - D = move right
 - Space = jump
-- Left click = attack while touching the enemy
+- Left click = attack with sword
 - R = respawn defeated enemy
 - Esc = pause menu
 

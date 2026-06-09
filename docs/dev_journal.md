@@ -308,3 +308,22 @@ To improve this, mouse movement now checks whether the cursor is over one of the
 - Reusing one selected option keeps keyboard and mouse navigation consistent.
 - Small interface polish can make a feature feel much more complete.
 
+
+## 2026-06-09 — Adding a Simple Sword
+
+The next step was to give the player a visible weapon. Instead of creating detailed character art, I added a simple sword made from basic rectangles: one rectangle for the blade and one for the hilt. This keeps the visual style simple while making the character read more clearly as a playable hero.
+
+To make the sword feel attached to the player, the game now tracks which direction the player is facing. Moving right sets the facing direction to the right, and moving left sets it to the left. The sword is then drawn on that side of the player. This is a small change, but it introduces an important idea: the player can have state that affects how they are drawn.
+
+The sword also changes combat slightly. Before this, the player had to overlap the enemy with their body to attack. Now the game creates a sword rectangle and checks whether that rectangle touches the enemy. This means the sword is not only visual; it also gives the attack its own range.
+
+This is still a very simple combat system, but it is a better foundation. Later, the sword could be animated, given a timed swing, or replaced with a sprite. For now, it gives the player a weapon and makes attacking easier to understand on screen.
+
+### Lessons Learned
+
+- A weapon can start as simple shapes before becoming detailed art.
+- Player direction can be stored as state.
+- Drawing can change based on the player's current state.
+- Attack range can use its own collision rectangle.
+- A visual object becomes more meaningful when it also affects gameplay.
+

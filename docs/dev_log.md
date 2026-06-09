@@ -98,3 +98,9 @@
 
 - Added mouse hover highlighting for pause menu options
 - Reused the selected pause option for both keyboard and mouse navigation
+
+- Added a simple sword blade and hilt to the player
+- Tracked which direction the player is facing
+- Made the sword switch sides when the player moves left or right
+- Changed enemy hit detection to use sword range instead of player body overlap
+- Updated controls and docs to describe sword attacks

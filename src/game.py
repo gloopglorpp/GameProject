@@ -11,6 +11,11 @@ JUMP_STRENGTH = -16
 GRAVITY = 1
 PLAYER_COLOR = (35, 46, 42)
 
+SWORD_LENGTH = 34
+SWORD_HEIGHT = 8
+SWORD_BLADE_COLOR = (204, 211, 203)
+SWORD_HILT_COLOR = (89, 64, 45)
+
 ENEMY_SIZE = 50
 ENEMY_COLOR = (64, 48, 46)
 ENEMY_DEFEATED_COLOR = (105, 105, 105)
@@ -132,7 +137,7 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
     controls = [
         "A / D: move",
         "Space: jump",
-        "Left click: attack while touching enemy",
+        "Left click: attack with sword",
         "R: respawn defeated enemy",
         "Esc: pause or return",
     ]
@@ -145,6 +150,29 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
     back_rect = get_controls_back_button()
     draw_menu_button(screen, button_font, "Back", back_rect, True)
     return back_rect
+
+
+def get_sword_rect(player_rect, player_facing):
+    sword_y = player_rect.centery - SWORD_HEIGHT // 2
+
+    if player_facing == 1:
+        return pygame.Rect(player_rect.right - 2, sword_y, SWORD_LENGTH, SWORD_HEIGHT)
+
+    return pygame.Rect(player_rect.left - SWORD_LENGTH + 2, sword_y, SWORD_LENGTH, SWORD_HEIGHT)
+
+
+def draw_player(screen, player_rect, player_facing):
+    pygame.draw.rect(screen, PLAYER_COLOR, player_rect, border_radius=6)
+
+    sword_rect = get_sword_rect(player_rect, player_facing)
+    pygame.draw.rect(screen, SWORD_BLADE_COLOR, sword_rect, border_radius=2)
+
+    if player_facing == 1:
+        hilt_rect = pygame.Rect(player_rect.right - 4, player_rect.centery - 11, 6, 22)
+    else:
+        hilt_rect = pygame.Rect(player_rect.left - 2, player_rect.centery - 11, 6, 22)
+
+    pygame.draw.rect(screen, SWORD_HILT_COLOR, hilt_rect, border_radius=2)
 
 
 def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):
@@ -203,6 +231,7 @@ def run_game(max_frames=None):
     enemy_text = ""
     enemy_text_timer = 0
     player_y_velocity = 0
+    player_facing = 1
     selected_pause_option = 0
     game_state = "playing"
     frames_run = 0
@@ -266,8 +295,10 @@ def run_game(max_frames=None):
 
             if keys[pygame.K_a]:
                 player_rect.x -= PLAYER_SPEED
+                player_facing = -1
             if keys[pygame.K_d]:
                 player_rect.x += PLAYER_SPEED
+                player_facing = 1
 
             player_rect.x = max(0, min(player_rect.x, SCREEN_WIDTH - PLAYER_SIZE))
 
@@ -281,8 +312,8 @@ def run_game(max_frames=None):
                 player_rect.bottom = GROUND_Y
                 player_y_velocity = 0
 
-            touching_enemy = player_rect.colliderect(enemy_rect)
-            if attack_pressed and touching_enemy and enemy_health > 0:
+            sword_rect = get_sword_rect(player_rect, player_facing)
+            if attack_pressed and sword_rect.colliderect(enemy_rect) and enemy_health > 0:
                 enemy_health = max(enemy_health - 1, 0)
 
                 if enemy_health == 2:
@@ -299,7 +330,7 @@ def run_game(max_frames=None):
 
         draw_background(screen)
 
-        pygame.draw.rect(screen, PLAYER_COLOR, player_rect, border_radius=6)
+        draw_player(screen, player_rect, player_facing)
         draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
 
         if enemy_text_timer > 0:
