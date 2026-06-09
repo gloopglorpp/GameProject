@@ -73,3 +73,11 @@
 - Updated README controls and run instructions
 - Updated the task list to show completed enemy combat milestones
 - Verified the project with Python compile and Pygame startup checks
+
+- Added a simple coloured sky background
+- Added faded mountain layers to create distance and setting
+- Added a grass and ground strip
+- Introduced a reusable GROUND_Y value
+- Positioned the player and enemy so their feet sit on the ground
+- Changed player movement from free movement to left/right ground movement
+- Learned how background layers can suggest atmosphere before adding detailed art assets

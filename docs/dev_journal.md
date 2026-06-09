@@ -232,4 +232,25 @@ Looking back, this stage was less about adding a brand-new mechanic and more abo
 - Documentation should be updated when the playable state of the game changes.
 - A good entry point makes a project easier to run, understand, and continue developing.
 
+## 2026-06-09 — Adding a First Sense of Place
+
+The next step was to make the game feel less like objects floating in an empty window. Instead of jumping straight into detailed art assets, I added a simple background made from basic Pygame shapes. This keeps the project understandable while still moving it closer to the mood of a real side-scrolling game.
+
+The background now has a soft blue sky, two faded mountain layers, and a strip of grass over darker ground. The mountains use transparent colours so they sit behind the playable area instead of competing with the player and enemy. This creates a sense of distance and setting without requiring finished artwork yet.
+
+I also introduced a `GROUND_Y` value. This represents the height of the ground in the game world. The player and enemy are positioned so the bottom of their rectangles sits on this line. This is important because it gives the scene a clear floor and stops the characters from feeling like they are floating.
+
+Because the characters are now fixed to the ground, player movement was changed from full WASD movement to left and right movement with A and D. This is closer to the kind of side-view adventure game I want to build. Jumping can be added later as its own feature, but for now the goal was simply to establish the world and make the characters belong inside it.
+
+This step also helped separate two different ideas: background visuals and gameplay space. The sky and mountains create atmosphere, while the ground line controls where the characters stand. Keeping those ideas separate should make it easier to improve the art later without breaking movement.
+
+### Lessons Learned
+
+- A game can gain atmosphere before it has finished art assets.
+- Transparent background layers can create a sense of distance.
+- A ground line gives characters a believable place to stand.
+- Shared values such as `GROUND_Y` make positioning easier to control.
+- Side-view movement can start with simple left and right controls.
+- It is better to add jumping later as its own clear mechanic.
+- Visual polish can be introduced gradually without making the project harder to understand.
 

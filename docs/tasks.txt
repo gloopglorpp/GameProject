@@ -5,6 +5,9 @@
 [x] Attack enemy
 [x] Enemy loses health
 [x] Enemy dies
+[x] Add simple sky and mountain background
+[x] Add grass ground line
+[x] Keep characters fixed to the ground
 [ ] Add player health
 [ ] Add enemy attacks
 [ ] Add inventory
