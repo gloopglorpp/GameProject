@@ -9,7 +9,9 @@ PLAYER_SIZE = 50
 PLAYER_SPEED = 5
 JUMP_STRENGTH = -16
 GRAVITY = 1
-PLAYER_COLOR = (35, 46, 42)
+PLAYER_COLOR = (25, 31, 29)
+PLAYER_LINE_WIDTH = 5
+PLAYER_HEAD_RADIUS = 8
 
 SWORD_LENGTH = 34
 SWORD_HEIGHT = 8
@@ -162,17 +164,27 @@ def get_sword_rect(player_rect, player_facing):
 
 
 def draw_player(screen, player_rect, player_facing):
-    pygame.draw.rect(screen, PLAYER_COLOR, player_rect, border_radius=6)
+    head_center = (player_rect.centerx, player_rect.y + 9)
+    neck = (player_rect.centerx, player_rect.y + 19)
+    hip = (player_rect.centerx, player_rect.y + 34)
+    front_hand = (player_rect.centerx + player_facing * 19, player_rect.y + 27)
+    back_hand = (player_rect.centerx - player_facing * 12, player_rect.y + 28)
+    front_foot = (player_rect.centerx + player_facing * 15, player_rect.bottom)
+    back_foot = (player_rect.centerx - player_facing * 13, player_rect.bottom)
 
     sword_rect = get_sword_rect(player_rect, player_facing)
-    pygame.draw.rect(screen, SWORD_BLADE_COLOR, sword_rect, border_radius=2)
+    sword_tip = sword_rect.midright if player_facing == 1 else sword_rect.midleft
+    hilt_end = (front_hand[0] - player_facing * 5, front_hand[1])
 
-    if player_facing == 1:
-        hilt_rect = pygame.Rect(player_rect.right - 4, player_rect.centery - 11, 6, 22)
-    else:
-        hilt_rect = pygame.Rect(player_rect.left - 2, player_rect.centery - 11, 6, 22)
+    pygame.draw.circle(screen, PLAYER_COLOR, head_center, PLAYER_HEAD_RADIUS)
+    pygame.draw.line(screen, PLAYER_COLOR, neck, hip, PLAYER_LINE_WIDTH)
+    pygame.draw.line(screen, PLAYER_COLOR, neck, front_hand, PLAYER_LINE_WIDTH)
+    pygame.draw.line(screen, PLAYER_COLOR, neck, back_hand, PLAYER_LINE_WIDTH)
+    pygame.draw.line(screen, PLAYER_COLOR, hip, front_foot, PLAYER_LINE_WIDTH)
+    pygame.draw.line(screen, PLAYER_COLOR, hip, back_foot, PLAYER_LINE_WIDTH)
 
-    pygame.draw.rect(screen, SWORD_HILT_COLOR, hilt_rect, border_radius=2)
+    pygame.draw.line(screen, SWORD_BLADE_COLOR, front_hand, sword_tip, SWORD_HEIGHT)
+    pygame.draw.line(screen, SWORD_HILT_COLOR, hilt_end, front_hand, PLAYER_LINE_WIDTH + 1)
 
 
 def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):

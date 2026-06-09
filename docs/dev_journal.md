@@ -327,3 +327,22 @@ This is still a very simple combat system, but it is a better foundation. Later,
 - Attack range can use its own collision rectangle.
 - A visual object becomes more meaningful when it also affects gameplay.
 
+
+## 2026-06-09 — Drawing a Player Silhouette
+
+The player started as a simple square, which was useful while learning movement and collision. Now that the game has a background, ground, jumping, and a sword, the square was starting to feel too abstract. The next visual step was to turn the player into a simple silhouette-style stick figure.
+
+Instead of adding detailed sprite art, I used basic Pygame drawing tools. The head is a circle, and the body, arms, and legs are lines. This fits the current simple art approach while moving the player closer to the moody silhouette style I want.
+
+Importantly, I kept the existing player rectangle for movement and collision. The rectangle still controls where the player is in the world, where they land, and how the sword position is calculated. Only the drawing changed. This keeps the code easier to understand because the visual appearance and the gameplay hitbox are separate ideas.
+
+The sword is now drawn from the front hand of the figure. It still uses the same sword collision rectangle for attacks, but visually it feels more attached to the character. This makes the player read more like a character holding a weapon instead of a box with a rectangle sticking out of it.
+
+### Lessons Learned
+
+- A character can be improved visually without adding image files.
+- Circles and lines can create a readable stick figure silhouette.
+- The drawing of a character can be separate from its collision rectangle.
+- Keeping the hitbox stable avoids breaking movement and combat while improving visuals.
+- Small visual upgrades can make existing mechanics feel more intentional.
+

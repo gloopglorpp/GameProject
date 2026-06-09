@@ -104,3 +104,9 @@
 - Made the sword switch sides when the player moves left or right
 - Changed enemy hit detection to use sword range instead of player body overlap
 - Updated controls and docs to describe sword attacks
+
+- Replaced the player square with a simple stick figure silhouette
+- Drew the player using a head circle and line-based body parts
+- Kept the existing player collision rectangle for movement and combat
+- Reattached the sword to the stick figure's front hand
+- Learned how visual drawing can change without changing the underlying hitbox

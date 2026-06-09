@@ -11,6 +11,7 @@
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu
+[x] Replace player square with stick figure silhouette
 [x] Add simple player sword
 [x] Use sword range for enemy attacks
 [ ] Add player health

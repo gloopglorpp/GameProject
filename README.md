@@ -10,6 +10,7 @@ A small Python/Pygame game project built as a learning exercise.
 - Lets the player jump with simple gravity
 - Draws a faded sky, mountain, and grass background
 - Spawns one enemy
+- Draws the player as a simple silhouette stick figure
 - Draws a simple sword attached to the player
 - Attacks the enemy with the sword using left click
 - Shows enemy health and defeat state
