@@ -294,3 +294,17 @@ This was a small change, but it was an important reminder that controls are part
 - Menu controls and gameplay controls can use different input rules.
 - Small control refinements are worth documenting because they explain design decisions.
 
+
+## 2026-06-09 — Improving Pause Menu Feedback
+
+After adding mouse support to the pause menu, I noticed that clicking worked but hovering did not visually highlight the option under the mouse. This made the menu feel less responsive, because the player could not easily tell which button the mouse was currently over.
+
+To improve this, mouse movement now checks whether the cursor is over one of the pause menu buttons. When it is, the game updates the selected pause option to match the hovered button. This means the same highlight system works for both keyboard navigation and mouse movement instead of creating two separate selection systems.
+
+### Lessons Learned
+
+- Mouse input should usually provide visual feedback before a click happens.
+- Hover feedback makes menus feel more responsive.
+- Reusing one selected option keeps keyboard and mouse navigation consistent.
+- Small interface polish can make a feature feel much more complete.
+

@@ -95,3 +95,6 @@
 - Kept enemy attacks on left mouse click only
 - Kept Enter and mouse click as pause menu selection controls
 - Updated the controls menu and README to match the new input layout
+
+- Added mouse hover highlighting for pause menu options
+- Reused the selected pause option for both keyboard and mouse navigation

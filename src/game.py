@@ -214,6 +214,10 @@ def run_game(max_frames=None):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEMOTION and game_state == "paused":
+                for index, (_, rect) in enumerate(get_pause_buttons()):
+                    if rect.collidepoint(event.pos):
+                        selected_pause_option = index
             elif event.type == pygame.KEYDOWN:
                 if game_state == "playing":
                     if event.key == pygame.K_ESCAPE:
