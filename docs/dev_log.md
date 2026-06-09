@@ -131,3 +131,10 @@
 - Changed left click from sword attack to punch attack
 - Drew a small fist on the front hand of the stick figure
 - Kept direction-based attack collision using a punch rectangle
+
+- Turned the player silhouette into a small blue wizard
+- Added a robe, pointed hat, sparkles, and wooden staff
+- Replaced punch attacks with staff-cast fireballs
+- Added fireball projectiles with glow, core, edge, and trail drawing
+- Made fireballs move through world space and collide with enemies
+- Updated controls and docs to describe fireball casting

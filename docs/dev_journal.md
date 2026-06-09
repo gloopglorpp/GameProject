@@ -408,3 +408,24 @@ This change also shows that development is not always a straight line. Adding th
 - A punch hitbox can reuse the same direction-based idea as the sword.
 - Iteration means keeping what works and changing what feels wrong.
 
+
+## 2026-06-09 — Turning the Player Into a Wizard
+
+After trying the sword and then simplifying to punching, I decided the character should lean more clearly into the fantasy RPG direction. The player is now drawn as a small wizard with a blue robe, pointed hat, sparkles, and a wooden staff. This keeps the simple silhouette foundation, but gives the character more personality and a clearer role in the world.
+
+The attack changed again too. Instead of punching, left click now casts a fireball from the staff. This builds on the same idea as the punch and sword experiments: the attack should have its own collision behavior rather than relying on the player's body. The difference is that the attack is now a projectile that moves through the world.
+
+Each fireball stores its world position, direction, and age. Every frame, the fireball moves forward and checks whether it touches the enemy. If it hits, the enemy loses health and the fireball disappears. If it gets too old, it also disappears so the game does not keep unused projectiles forever.
+
+Visually, the fireball is drawn with a glow, darker outer edge, bright orange middle, pale hot center, and a short trail. It is still made from Pygame shapes, but layering circles and transparent glow makes it feel more alive than a flat rectangle.
+
+This step shows how earlier experiments still matter. The sword introduced attack range, the punch simplified the character, and the wizard fireball turns that same combat idea into a ranged magic attack that fits the game's fantasy setting better.
+
+### Lessons Learned
+
+- Character design can change as the game's identity becomes clearer.
+- A projectile needs position, direction, age, movement, and collision.
+- World-space projectiles keep working in a scrolling world.
+- Layered shapes and transparency can make simple effects feel more alive.
+- Earlier experiments can lead to better design decisions later.
+

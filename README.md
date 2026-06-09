@@ -15,7 +15,8 @@ A small Python/Pygame game project built as a learning exercise.
 - Spawns one enemy
 - Draws the player as a simple silhouette stick figure
 - Animates the player silhouette while walking and jumping
-- Attacks the enemy with a short punch using left click
+- Draws the player as a little blue wizard with robe, hat, and staff
+- Casts glowing fireballs from the staff with left click
 - Shows enemy health and defeat state
 
 ## Controls
@@ -23,7 +24,7 @@ A small Python/Pygame game project built as a learning exercise.
 - A = move left
 - D = move right
 - Space = jump
-- Left click = punch
+- Left click = cast fireball
 - R = respawn defeated enemy
 - Esc = pause menu
 

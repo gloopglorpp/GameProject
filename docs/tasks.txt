@@ -18,6 +18,8 @@
 [x] Add simple player sword
 [x] Use sword range for enemy attacks
 [x] Replace sword with punch attack
+[x] Turn player into a wizard
+[x] Add staff-cast fireballs
 [ ] Add player health
 [ ] Add enemy attacks
 [ ] Add inventory

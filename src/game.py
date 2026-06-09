@@ -16,10 +16,21 @@ PLAYER_COLOR = (25, 31, 29)
 PLAYER_LINE_WIDTH = 5
 PLAYER_HEAD_RADIUS = 8
 WALK_ANIMATION_SPEED = 0.28
+ROBE_COLOR = (37, 67, 130)
+ROBE_SHADOW_COLOR = (24, 39, 86)
+HAT_COLOR = (41, 91, 172)
+HAT_TRIM_COLOR = (128, 185, 238)
+SPARKLE_COLOR = (210, 235, 255)
+STAFF_COLOR = (96, 62, 35)
+STAFF_GLOW_COLOR = (255, 190, 92)
 
-PUNCH_RANGE = 24
-PUNCH_HEIGHT = 16
-FIST_RADIUS = 4
+FIREBALL_SPEED = 9
+FIREBALL_RADIUS = 8
+FIREBALL_LIFETIME = 90
+FIREBALL_CORE_COLOR = (255, 230, 120)
+FIREBALL_MID_COLOR = (255, 118, 31)
+FIREBALL_EDGE_COLOR = (185, 38, 13)
+FIREBALL_GLOW_COLOR = (255, 126, 28, 95)
 
 ENEMY_SIZE = 50
 ENEMY_COLOR = (64, 48, 46)
@@ -174,7 +185,7 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
     controls = [
         "A / D: move",
         "Space: jump",
-        "Left click: punch",
+        "Left click: cast fireball",
         "R: respawn defeated enemy",
         "Esc: pause or return",
     ]
@@ -189,16 +200,13 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
     return back_rect
 
 
-def get_punch_rect(player_rect, player_facing):
-    punch_y = player_rect.centery - PUNCH_HEIGHT // 2
-
-    if player_facing == 1:
-        return pygame.Rect(player_rect.right - 2, punch_y, PUNCH_RANGE, PUNCH_HEIGHT)
-
-    return pygame.Rect(player_rect.left - PUNCH_RANGE + 2, punch_y, PUNCH_RANGE, PUNCH_HEIGHT)
+def get_staff_points(player_rect, player_facing, front_hand):
+    staff_top = (front_hand[0] + player_facing * 11, front_hand[1] - 24)
+    staff_bottom = (front_hand[0] - player_facing * 7, front_hand[1] + 17)
+    return staff_top, staff_bottom
 
 
-def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, is_jumping):
+def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, is_jumping, background_time):
     step = math.sin(animation_frame) if is_moving else 0
     bounce = abs(step) * 2 if is_moving and not is_jumping else 0
 
@@ -219,14 +227,64 @@ def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, 
         front_foot = (player_rect.centerx + player_facing * (15 + leg_swing), player_rect.bottom)
         back_foot = (player_rect.centerx - player_facing * (13 + leg_swing), player_rect.bottom)
 
-    pygame.draw.circle(screen, PLAYER_COLOR, head_center, PLAYER_HEAD_RADIUS)
-    pygame.draw.line(screen, PLAYER_COLOR, neck, hip, PLAYER_LINE_WIDTH)
-    pygame.draw.line(screen, PLAYER_COLOR, neck, front_hand, PLAYER_LINE_WIDTH)
-    pygame.draw.line(screen, PLAYER_COLOR, neck, back_hand, PLAYER_LINE_WIDTH)
+    robe_points = [
+        (player_rect.centerx - 13, player_rect.y + 20 - bounce),
+        (player_rect.centerx + 13, player_rect.y + 20 - bounce),
+        (player_rect.centerx + 19, player_rect.bottom),
+        (player_rect.centerx - 19, player_rect.bottom),
+    ]
+    hat_points = [
+        (player_rect.centerx - 15, player_rect.y + 4 - bounce),
+        (player_rect.centerx + 15, player_rect.y + 4 - bounce),
+        (player_rect.centerx + player_facing * 5, player_rect.y - 25 - bounce),
+    ]
+    staff_top, staff_bottom = get_staff_points(player_rect, player_facing, front_hand)
+
     pygame.draw.line(screen, PLAYER_COLOR, hip, front_foot, PLAYER_LINE_WIDTH)
     pygame.draw.line(screen, PLAYER_COLOR, hip, back_foot, PLAYER_LINE_WIDTH)
+    pygame.draw.polygon(screen, ROBE_COLOR, robe_points)
+    pygame.draw.line(screen, ROBE_SHADOW_COLOR, robe_points[0], robe_points[3], 3)
+    pygame.draw.circle(screen, PLAYER_COLOR, head_center, PLAYER_HEAD_RADIUS)
+    pygame.draw.polygon(screen, HAT_COLOR, hat_points)
+    pygame.draw.line(screen, HAT_TRIM_COLOR, hat_points[0], hat_points[1], 3)
+    pygame.draw.line(screen, PLAYER_COLOR, neck, front_hand, PLAYER_LINE_WIDTH)
+    pygame.draw.line(screen, PLAYER_COLOR, neck, back_hand, PLAYER_LINE_WIDTH)
+    pygame.draw.line(screen, STAFF_COLOR, staff_bottom, staff_top, 5)
+    pygame.draw.circle(screen, STAFF_GLOW_COLOR, staff_top, 5)
 
-    pygame.draw.circle(screen, PLAYER_COLOR, front_hand, FIST_RADIUS)
+    for offset in (0, 11, 23):
+        sparkle_x = player_rect.centerx - 8 + (offset % 3) * 8
+        sparkle_y = player_rect.y + 9 + ((background_time + offset) % 30) // 10 * 9
+        pygame.draw.circle(screen, SPARKLE_COLOR, (sparkle_x, sparkle_y), 1)
+
+
+def draw_fireball(screen, fireball, world_x):
+    screen_x = int(fireball["x"] - world_x + PLAYER_SCREEN_X)
+    y = int(fireball["y"])
+    direction = fireball["direction"]
+
+    glow = pygame.Surface((54, 38), pygame.SRCALPHA)
+    pygame.draw.ellipse(glow, FIREBALL_GLOW_COLOR, (0, 0, 54, 38))
+    screen.blit(glow, (screen_x - 27, y - 19))
+
+    for index in range(3):
+        trail_x = screen_x - direction * (12 + index * 9)
+        trail_radius = max(2, FIREBALL_RADIUS - index * 2)
+        pygame.draw.circle(screen, FIREBALL_EDGE_COLOR, (trail_x, y), trail_radius)
+
+    pygame.draw.circle(screen, FIREBALL_EDGE_COLOR, (screen_x, y), FIREBALL_RADIUS + 3)
+    pygame.draw.circle(screen, FIREBALL_MID_COLOR, (screen_x, y), FIREBALL_RADIUS)
+    pygame.draw.circle(screen, FIREBALL_CORE_COLOR, (screen_x - direction * 2, y - 2), FIREBALL_RADIUS // 2)
+
+
+def get_fireball_rect(fireball, world_x):
+    screen_x = int(fireball["x"] - world_x + PLAYER_SCREEN_X)
+    return pygame.Rect(
+        screen_x - FIREBALL_RADIUS,
+        int(fireball["y"] - FIREBALL_RADIUS),
+        FIREBALL_RADIUS * 2,
+        FIREBALL_RADIUS * 2,
+    )
 
 
 def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):
@@ -289,6 +347,7 @@ def run_game(max_frames=None):
     player_facing = 1
     player_animation_frame = 0
     player_is_moving = False
+    fireballs = []
     world_x = 0
     background_time = 0
     selected_pause_option = 0
@@ -297,7 +356,7 @@ def run_game(max_frames=None):
     running = True
 
     while running:
-        attack_pressed = False
+        cast_pressed = False
         jump_pressed = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -335,7 +394,7 @@ def run_game(max_frames=None):
                         game_state = "paused"
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if game_state == "playing":
-                    attack_pressed = True
+                    cast_pressed = True
                 elif game_state == "paused":
                     for index, (_, rect) in enumerate(get_pause_buttons()):
                         if rect.collidepoint(event.pos):
@@ -381,18 +440,38 @@ def run_game(max_frames=None):
                 player_rect.bottom = GROUND_Y
                 player_y_velocity = 0
 
-            punch_rect = get_punch_rect(player_rect, player_facing)
-            if attack_pressed and punch_rect.colliderect(enemy_rect) and enemy_health > 0:
-                enemy_health = max(enemy_health - 1, 0)
+            if cast_pressed:
+                front_hand = (
+                    player_rect.centerx + player_facing * 18,
+                    player_rect.y + 24 if player_rect.bottom < GROUND_Y else player_rect.y + 27,
+                )
+                staff_top, _ = get_staff_points(player_rect, player_facing, front_hand)
+                fireballs.append({
+                    "x": world_x + staff_top[0] - PLAYER_SCREEN_X,
+                    "y": staff_top[1],
+                    "direction": player_facing,
+                    "age": 0,
+                })
 
-                if enemy_health == 2:
-                    enemy_text = "???"
-                elif enemy_health == 1:
-                    enemy_text = "OUCH!!"
-                else:
-                    enemy_text = "Defeated!"
+            for fireball in fireballs[:]:
+                fireball["x"] += FIREBALL_SPEED * fireball["direction"]
+                fireball["age"] += 1
+                fireball_rect = get_fireball_rect(fireball, world_x)
 
-                enemy_text_timer = 60
+                if fireball_rect.colliderect(enemy_rect) and enemy_health > 0:
+                    enemy_health = max(enemy_health - 1, 0)
+                    fireballs.remove(fireball)
+
+                    if enemy_health == 2:
+                        enemy_text = "???"
+                    elif enemy_health == 1:
+                        enemy_text = "HOT!!"
+                    else:
+                        enemy_text = "Defeated!"
+
+                    enemy_text_timer = 60
+                elif fireball["age"] > FIREBALL_LIFETIME:
+                    fireballs.remove(fireball)
 
             if enemy_text_timer > 0:
                 enemy_text_timer -= 1
@@ -401,8 +480,19 @@ def run_game(max_frames=None):
 
         draw_background(screen, world_x, background_time)
 
+        for fireball in fireballs:
+            draw_fireball(screen, fireball, world_x)
+
         player_is_jumping = player_rect.bottom < GROUND_Y or player_y_velocity != 0
-        draw_player(screen, player_rect, player_facing, player_animation_frame, player_is_moving, player_is_jumping)
+        draw_player(
+            screen,
+            player_rect,
+            player_facing,
+            player_animation_frame,
+            player_is_moving,
+            player_is_jumping,
+            background_time,
+        )
         if -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
             draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
 
