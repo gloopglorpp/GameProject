@@ -389,3 +389,22 @@ The important part is that the hitbox did not change. The player rectangle still
 - Visual animation should not always change the gameplay hitbox.
 - Procedural animation is a good first step before using sprite sheets.
 
+
+## 2026-06-09 — Replacing the Sword With a Punch
+
+After seeing the sword attached to the stick figure, I decided it looked a bit silly for the current art style. This was a useful design moment: sometimes a feature works technically, but it does not fit the look or feeling of the game yet. Rather than forcing it to stay, I simplified the attack back down to a punch.
+
+The sword drawing was removed, but the idea of attack range stayed. Instead of a sword rectangle, the game now creates a short punch rectangle in front of the player. This keeps the useful part of the previous work while making the character look cleaner.
+
+The stick figure now draws a small fist on the front hand. The fist is mostly visual, while the punch rectangle handles collision with the enemy. This keeps the same separation between appearance and gameplay logic that has been useful throughout the project.
+
+This change also shows that development is not always a straight line. Adding the sword helped introduce attack range and direction, and removing it helped refine the visual style. The project still moved forward because the lesson from the sword stayed in the code.
+
+### Lessons Learned
+
+- A feature can work but still not fit the current style.
+- Removing or simplifying a feature can be progress.
+- Attack range can exist without drawing a weapon.
+- A punch hitbox can reuse the same direction-based idea as the sword.
+- Iteration means keeping what works and changing what feels wrong.
+

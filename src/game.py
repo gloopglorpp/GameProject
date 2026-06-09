@@ -17,10 +17,9 @@ PLAYER_LINE_WIDTH = 5
 PLAYER_HEAD_RADIUS = 8
 WALK_ANIMATION_SPEED = 0.28
 
-SWORD_LENGTH = 34
-SWORD_HEIGHT = 8
-SWORD_BLADE_COLOR = (204, 211, 203)
-SWORD_HILT_COLOR = (89, 64, 45)
+PUNCH_RANGE = 24
+PUNCH_HEIGHT = 16
+FIST_RADIUS = 4
 
 ENEMY_SIZE = 50
 ENEMY_COLOR = (64, 48, 46)
@@ -175,7 +174,7 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
     controls = [
         "A / D: move",
         "Space: jump",
-        "Left click: attack with sword",
+        "Left click: punch",
         "R: respawn defeated enemy",
         "Esc: pause or return",
     ]
@@ -190,13 +189,13 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
     return back_rect
 
 
-def get_sword_rect(player_rect, player_facing):
-    sword_y = player_rect.centery - SWORD_HEIGHT // 2
+def get_punch_rect(player_rect, player_facing):
+    punch_y = player_rect.centery - PUNCH_HEIGHT // 2
 
     if player_facing == 1:
-        return pygame.Rect(player_rect.right - 2, sword_y, SWORD_LENGTH, SWORD_HEIGHT)
+        return pygame.Rect(player_rect.right - 2, punch_y, PUNCH_RANGE, PUNCH_HEIGHT)
 
-    return pygame.Rect(player_rect.left - SWORD_LENGTH + 2, sword_y, SWORD_LENGTH, SWORD_HEIGHT)
+    return pygame.Rect(player_rect.left - PUNCH_RANGE + 2, punch_y, PUNCH_RANGE, PUNCH_HEIGHT)
 
 
 def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, is_jumping):
@@ -220,10 +219,6 @@ def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, 
         front_foot = (player_rect.centerx + player_facing * (15 + leg_swing), player_rect.bottom)
         back_foot = (player_rect.centerx - player_facing * (13 + leg_swing), player_rect.bottom)
 
-    sword_rect = get_sword_rect(player_rect, player_facing)
-    sword_tip = sword_rect.midright if player_facing == 1 else sword_rect.midleft
-    hilt_end = (front_hand[0] - player_facing * 5, front_hand[1])
-
     pygame.draw.circle(screen, PLAYER_COLOR, head_center, PLAYER_HEAD_RADIUS)
     pygame.draw.line(screen, PLAYER_COLOR, neck, hip, PLAYER_LINE_WIDTH)
     pygame.draw.line(screen, PLAYER_COLOR, neck, front_hand, PLAYER_LINE_WIDTH)
@@ -231,8 +226,7 @@ def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, 
     pygame.draw.line(screen, PLAYER_COLOR, hip, front_foot, PLAYER_LINE_WIDTH)
     pygame.draw.line(screen, PLAYER_COLOR, hip, back_foot, PLAYER_LINE_WIDTH)
 
-    pygame.draw.line(screen, SWORD_BLADE_COLOR, front_hand, sword_tip, SWORD_HEIGHT)
-    pygame.draw.line(screen, SWORD_HILT_COLOR, hilt_end, front_hand, PLAYER_LINE_WIDTH + 1)
+    pygame.draw.circle(screen, PLAYER_COLOR, front_hand, FIST_RADIUS)
 
 
 def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):
@@ -387,8 +381,8 @@ def run_game(max_frames=None):
                 player_rect.bottom = GROUND_Y
                 player_y_velocity = 0
 
-            sword_rect = get_sword_rect(player_rect, player_facing)
-            if attack_pressed and sword_rect.colliderect(enemy_rect) and enemy_health > 0:
+            punch_rect = get_punch_rect(player_rect, player_facing)
+            if attack_pressed and punch_rect.colliderect(enemy_rect) and enemy_health > 0:
                 enemy_health = max(enemy_health - 1, 0)
 
                 if enemy_health == 2:

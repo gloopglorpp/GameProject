@@ -125,3 +125,9 @@
 - Added a small body bounce during walking
 - Added a separate jumping pose for the player silhouette
 - Kept the player hitbox unchanged while animating the drawing
+
+- Removed the visible sword from the player
+- Added a short punch range in front of the player
+- Changed left click from sword attack to punch attack
+- Drew a small fist on the front hand of the stick figure
+- Kept direction-based attack collision using a punch rectangle

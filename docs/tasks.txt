@@ -17,6 +17,7 @@
 [x] Animate player walking and jumping poses
 [x] Add simple player sword
 [x] Use sword range for enemy attacks
+[x] Replace sword with punch attack
 [ ] Add player health
 [ ] Add enemy attacks
 [ ] Add inventory

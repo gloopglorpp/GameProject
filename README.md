@@ -15,8 +15,7 @@ A small Python/Pygame game project built as a learning exercise.
 - Spawns one enemy
 - Draws the player as a simple silhouette stick figure
 - Animates the player silhouette while walking and jumping
-- Draws a simple sword attached to the player
-- Attacks the enemy with the sword using left click
+- Attacks the enemy with a short punch using left click
 - Shows enemy health and defeat state
 
 ## Controls
@@ -24,7 +23,7 @@ A small Python/Pygame game project built as a learning exercise.
 - A = move left
 - D = move right
 - Space = jump
-- Left click = attack with sword
+- Left click = punch
 - R = respawn defeated enemy
 - Esc = pause menu
 
