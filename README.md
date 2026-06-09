@@ -14,6 +14,7 @@ A small Python/Pygame game project built as a learning exercise.
 - Adds gentle background motion while the game is playing
 - Spawns one enemy
 - Draws the player as a simple silhouette stick figure
+- Animates the player silhouette while walking and jumping
 - Draws a simple sword attached to the player
 - Attacks the enemy with the sword using left click
 - Shows enemy health and defeat state

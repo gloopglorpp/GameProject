@@ -1,3 +1,5 @@
+import math
+
 import pygame
 
 
@@ -13,6 +15,7 @@ GRAVITY = 1
 PLAYER_COLOR = (25, 31, 29)
 PLAYER_LINE_WIDTH = 5
 PLAYER_HEAD_RADIUS = 8
+WALK_ANIMATION_SPEED = 0.28
 
 SWORD_LENGTH = 34
 SWORD_HEIGHT = 8
@@ -196,14 +199,26 @@ def get_sword_rect(player_rect, player_facing):
     return pygame.Rect(player_rect.left - SWORD_LENGTH + 2, sword_y, SWORD_LENGTH, SWORD_HEIGHT)
 
 
-def draw_player(screen, player_rect, player_facing):
-    head_center = (player_rect.centerx, player_rect.y + 9)
-    neck = (player_rect.centerx, player_rect.y + 19)
-    hip = (player_rect.centerx, player_rect.y + 34)
-    front_hand = (player_rect.centerx + player_facing * 19, player_rect.y + 27)
-    back_hand = (player_rect.centerx - player_facing * 12, player_rect.y + 28)
-    front_foot = (player_rect.centerx + player_facing * 15, player_rect.bottom)
-    back_foot = (player_rect.centerx - player_facing * 13, player_rect.bottom)
+def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, is_jumping):
+    step = math.sin(animation_frame) if is_moving else 0
+    bounce = abs(step) * 2 if is_moving and not is_jumping else 0
+
+    head_center = (player_rect.centerx, player_rect.y + 9 - bounce)
+    neck = (player_rect.centerx, player_rect.y + 19 - bounce)
+    hip = (player_rect.centerx, player_rect.y + 34 - bounce)
+
+    if is_jumping:
+        front_hand = (player_rect.centerx + player_facing * 18, player_rect.y + 24)
+        back_hand = (player_rect.centerx - player_facing * 15, player_rect.y + 24)
+        front_foot = (player_rect.centerx + player_facing * 11, player_rect.bottom - 6)
+        back_foot = (player_rect.centerx - player_facing * 13, player_rect.bottom - 9)
+    else:
+        arm_swing = step * 8
+        leg_swing = step * 13
+        front_hand = (player_rect.centerx + player_facing * (18 - arm_swing), player_rect.y + 27 - bounce)
+        back_hand = (player_rect.centerx - player_facing * (13 - arm_swing), player_rect.y + 28 - bounce)
+        front_foot = (player_rect.centerx + player_facing * (15 + leg_swing), player_rect.bottom)
+        back_foot = (player_rect.centerx - player_facing * (13 + leg_swing), player_rect.bottom)
 
     sword_rect = get_sword_rect(player_rect, player_facing)
     sword_tip = sword_rect.midright if player_facing == 1 else sword_rect.midleft
@@ -278,6 +293,8 @@ def run_game(max_frames=None):
     enemy_text_timer = 0
     player_y_velocity = 0
     player_facing = 1
+    player_animation_frame = 0
+    player_is_moving = False
     world_x = 0
     background_time = 0
     selected_pause_option = 0
@@ -342,13 +359,21 @@ def run_game(max_frames=None):
             background_time += 1
             enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
             keys = pygame.key.get_pressed()
+            player_is_moving = False
 
             if keys[pygame.K_a]:
                 world_x = max(0, world_x - PLAYER_SPEED)
                 player_facing = -1
+                player_is_moving = True
             if keys[pygame.K_d]:
                 world_x += PLAYER_SPEED
                 player_facing = 1
+                player_is_moving = True
+
+            if player_is_moving:
+                player_animation_frame += WALK_ANIMATION_SPEED
+            else:
+                player_animation_frame = 0
 
             player_rect.x = PLAYER_SCREEN_X
 
@@ -382,7 +407,8 @@ def run_game(max_frames=None):
 
         draw_background(screen, world_x, background_time)
 
-        draw_player(screen, player_rect, player_facing)
+        player_is_jumping = player_rect.bottom < GROUND_Y or player_y_velocity != 0
+        draw_player(screen, player_rect, player_facing, player_animation_frame, player_is_moving, player_is_jumping)
         if -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
             draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
 

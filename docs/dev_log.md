@@ -119,3 +119,9 @@
 - Added parallax mountain movement for background depth
 - Added repeating grass highlights to make the ground feel alive
 - Learned the difference between screen position and world position
+
+- Added a walking animation frame for the player silhouette
+- Used a sine wave to swing the player's arms and legs while moving
+- Added a small body bounce during walking
+- Added a separate jumping pose for the player silhouette
+- Kept the player hitbox unchanged while animating the drawing

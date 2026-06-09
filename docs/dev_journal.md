@@ -369,3 +369,23 @@ This step still keeps the art simple. The background is made from shapes, not im
 - Time-based animation and movement-based scrolling can work together.
 - World progression can be added before building a full level system.
 
+
+## 2026-06-09 — Animating the Player Body
+
+After changing the player from a square into a stick figure silhouette, the next step was to make the body feel alive. Instead of adding sprite sheets, I animated the existing lines and circle using code. This keeps the project simple while introducing the idea that drawing can change over time.
+
+The walking animation uses an animation frame value and a sine wave. As the player moves, the frame increases. The sine wave then creates a smooth back-and-forth value, which is used to swing the arms and legs. This creates a basic walking cycle without needing separate images for each pose.
+
+I also added a small body bounce during walking. The head, neck, and hips move slightly as the legs swing, which makes the silhouette feel less stiff. When the player is in the air, the drawing switches to a jumping pose with the arms and legs pulled into a different shape.
+
+The important part is that the hitbox did not change. The player rectangle still controls movement, jumping, landing, and sword collision. Only the drawing changes. This keeps the animation safe because it improves the look of the character without breaking the gameplay rules underneath.
+
+### Lessons Learned
+
+- Animation can be created by changing drawing positions over time.
+- A sine wave is useful for smooth repeating motion.
+- Walking can start with simple arm and leg swing.
+- Jumping can use a different pose from walking.
+- Visual animation should not always change the gameplay hitbox.
+- Procedural animation is a good first step before using sprite sheets.
+
