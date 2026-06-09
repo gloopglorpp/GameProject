@@ -1,254 +1,155 @@
-# Import the pygame library
 import pygame
 
-# Initialize all pygame modules
-# This must be called before using most pygame features
-pygame.init()
 
-# Screen size
-screen_width = 800
-screen_height = 600
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+FPS = 60
 
-# Create a game window
-screen = pygame.display.set_mode((screen_width, screen_height))
+PLAYER_SIZE = 50
+PLAYER_SPEED = 5
+PLAYER_COLOR = (66, 220, 117)
 
-# Set the title shown at the top of the window
-pygame.display.set_caption("My Game")
+ENEMY_SIZE = 50
+ENEMY_COLOR = (225, 72, 72)
+ENEMY_DEFEATED_COLOR = (105, 105, 105)
 
-# Create a font for drawing text on the screen
-font = pygame.font.Font(None, 36)
+BACKGROUND_COLOR = (25, 29, 35)
+TEXT_COLOR = (235, 238, 245)
+MUTED_TEXT_COLOR = (155, 165, 180)
 
-# Create a variable that controls whether the game is running
-running = True
 
-# Player position
-player_x = 100
-player_y = 100
+def draw_text(screen, font, text, x, y, color=TEXT_COLOR):
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, (x, y))
 
-# Player size
-player_size = 50
 
-# How many pixels the player moves each frame
-player_speed = 5
+def draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health):
+    if enemy_health > 0:
+        pygame.draw.rect(screen, ENEMY_COLOR, enemy_rect, border_radius=6)
+    else:
+        pygame.draw.rect(screen, ENEMY_DEFEATED_COLOR, enemy_rect, border_radius=6)
 
-# Enemy position
-enemy_x = 500
-enemy_y = 300
+        pygame.draw.line(
+            screen,
+            TEXT_COLOR,
+            (enemy_rect.x + 12, enemy_rect.y + 12),
+            (enemy_rect.x + ENEMY_SIZE - 12, enemy_rect.y + ENEMY_SIZE - 12),
+            3,
+        )
+        pygame.draw.line(
+            screen,
+            TEXT_COLOR,
+            (enemy_rect.x + ENEMY_SIZE - 12, enemy_rect.y + 12),
+            (enemy_rect.x + 12, enemy_rect.y + ENEMY_SIZE - 12),
+            3,
+        )
 
-# Enemy size
-enemy_size = 50
-
-# Enemy health
-enemy_health = 3
-enemy_max_health = 3
-
-# Enemy speech text
-enemy_text = ""
-
-# How many frames the text should remain visible
-enemy_text_timer = 0
-
-# Has the enemy finished dying?
-enemy_dead = False
-
-# Tracks whether the left mouse button was clicked this frame
-mouse_clicked = False
-
-collision_active = False
-
-# Create a clock to control the frame rate
-clock = pygame.time.Clock()
-
-# Main game loop
-# This will continue running until running becomes False
-while running:
-    
-    # Reset mouse click each frame
-    mouse_clicked = False
-
-    # Check for events (keyboard, mouse, window close, etc.)
-    for event in pygame.event.get():
-
-        # Check for left mouse button click
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                mouse_clicked = True
-        # Check if the player clicked the X button
-        elif event.type == pygame.QUIT:
-
-            # Stop the game loop
-            running = False
-
-    # Check which keys are currently being held down
-    keys = pygame.key.get_pressed()
-
-    # Move left (A)
-    if keys[pygame.K_a]:
-        player_x -= player_speed
-
-    # Move right (D)
-    if keys[pygame.K_d]:
-        player_x += player_speed
-
-    # Move up (W)
-    if keys[pygame.K_w]:
-        player_y -= player_speed
-
-    # Move down (S)
-    if keys[pygame.K_s]:
-        player_y += player_speed
-
-    # Prevent the player from leaving the screen
-
-    if player_x < 0:
-        player_x = 0
-
-    if player_y < 0:
-        player_y = 0
-
-    if player_x > screen_width - player_size:
-        player_x = screen_width - player_size
-
-    if player_y > screen_height - player_size:
-        player_y = screen_height - player_size
-
-    # Create rectangles for collision detection
-    player_rect = pygame.Rect(
-        player_x,
-        player_y,
-        player_size,
-        player_size
+    health_bar_width = ENEMY_SIZE
+    pygame.draw.rect(
+        screen,
+        (80, 85, 95),
+        (enemy_rect.x, enemy_rect.y - 15, health_bar_width, 8),
+        border_radius=3,
     )
 
-    enemy_rect = pygame.Rect(
-        enemy_x,
-        enemy_y,
-        enemy_size,
-        enemy_size
+    health_ratio = enemy_health / enemy_max_health
+    pygame.draw.rect(
+        screen,
+        (95, 215, 105),
+        (enemy_rect.x, enemy_rect.y - 15, health_bar_width * health_ratio, 8),
+        border_radius=3,
     )
 
-    # Check if player and enemy are touching
-    if player_rect.colliderect(enemy_rect):
 
-        # If the player clicks while touching the enemy and enemy is still alive.
-        if mouse_clicked and enemy_health > 0:
-            enemy_health -= 1
-            enemy_health = max(enemy_health, 0)
-            
+def run_game(max_frames=None):
+    pygame.init()
+
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("GameProject")
+    clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 32)
+    small_font = pygame.font.Font(None, 24)
+
+    player_rect = pygame.Rect(100, 100, PLAYER_SIZE, PLAYER_SIZE)
+    enemy_rect = pygame.Rect(500, 300, ENEMY_SIZE, ENEMY_SIZE)
+
+    enemy_max_health = 3
+    enemy_health = enemy_max_health
+    enemy_text = ""
+    enemy_text_timer = 0
+    frames_run = 0
+    running = True
+
+    while running:
+        attack_pressed = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_SPACE:
+                    attack_pressed = True
+                elif event.key == pygame.K_r and enemy_health == 0:
+                    enemy_health = enemy_max_health
+                    enemy_text = "Back for more!"
+                    enemy_text_timer = 60
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                attack_pressed = True
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_a]:
+            player_rect.x -= PLAYER_SPEED
+        if keys[pygame.K_d]:
+            player_rect.x += PLAYER_SPEED
+        if keys[pygame.K_w]:
+            player_rect.y -= PLAYER_SPEED
+        if keys[pygame.K_s]:
+            player_rect.y += PLAYER_SPEED
+
+        player_rect.clamp_ip(screen.get_rect())
+
+        touching_enemy = player_rect.colliderect(enemy_rect)
+        if attack_pressed and touching_enemy and enemy_health > 0:
+            enemy_health = max(enemy_health - 1, 0)
+
             if enemy_health == 2:
                 enemy_text = "???"
             elif enemy_health == 1:
                 enemy_text = "OUCH!!"
-            elif enemy_health == 0:
-                enemy_text = "Ugh... I'm defeated..."
+            else:
+                enemy_text = "Defeated!"
+
             enemy_text_timer = 60
 
-            print(f"Enemy health: {enemy_health}")
+        if enemy_text_timer > 0:
+            enemy_text_timer -= 1
 
-        collision_active = True
+        screen.fill(BACKGROUND_COLOR)
 
-    else:
-        collision_active = False
+        pygame.draw.rect(screen, PLAYER_COLOR, player_rect, border_radius=6)
+        draw_enemy(screen, enemy_rect, enemy_health, enemy_max_health)
 
-    # Count down the enemy text timer
-    if enemy_text_timer > 0:
-        enemy_text_timer -= 1
+        if enemy_text_timer > 0:
+            draw_text(screen, font, enemy_text, enemy_rect.x, enemy_rect.y - 45)
 
-    # Once the death message finishes, mark the enemy as fully dead
-    if enemy_text_timer == 0 and enemy_health == 0:
-        enemy_dead = True
+        draw_text(screen, small_font, "WASD move", 20, 20, MUTED_TEXT_COLOR)
+        draw_text(screen, small_font, "Space/click attack while touching", 20, 45, MUTED_TEXT_COLOR)
 
-    # Draw the frame
-    screen.fill((30, 30, 30))
+        if enemy_health == 0:
+            draw_text(screen, small_font, "Press R to respawn the enemy", 20, 70, MUTED_TEXT_COLOR)
 
-    # Draw the player
-    pygame.draw.rect(
-        screen,
-        (0, 255, 0),
-        (player_x, player_y, player_size, player_size)
-    )
+        pygame.display.flip()
+        clock.tick(FPS)
 
-    
-    # Draw the enemy
-    if enemy_dead:
-        pygame.draw.rect(
-            screen,
-            (100, 100, 100),
-            (enemy_x, enemy_y, enemy_size, enemy_size)
-        )
+        frames_run += 1
+        if max_frames is not None and frames_run >= max_frames:
+            running = False
 
-        # Draw death marker
-        pygame.draw.line(
-            screen,
-            (255, 255, 255),
-            (enemy_x + 10, enemy_y + 10),
-            (enemy_x + 40, enemy_y + 40),
-            3
-        )
+    pygame.quit()
 
-        pygame.draw.line(
-            screen,
-            (255, 255, 255),
-            (enemy_x + 40, enemy_y + 10),
-            (enemy_x + 10, enemy_y + 40),
-            3
-        )
 
-    else:
-        pygame.draw.rect(
-            screen,
-            (255, 0, 0),
-            (enemy_x, enemy_y, enemy_size, enemy_size)
-        )
-
-    # Draw skull when enemy is dead
-    if enemy_health == 0:
-
-        pygame.draw.line(
-            screen,
-            (255, 255, 255),
-            (enemy_x + 10, enemy_y + 10),
-            (enemy_x + 40, enemy_y + 40),
-            3
-        )
-
-        pygame.draw.line(
-            screen,
-            (255, 255, 255),
-            (enemy_x + 40, enemy_y + 10),
-            (enemy_x + 10, enemy_y + 40),
-            3
-        )
-
-    # Enemy health bar background
-    
-    pygame.draw.rect(
-        screen,
-        (80, 80, 80),
-        (enemy_x, enemy_y - 15, enemy_size, 8)
-    )
-
-    # Enemy health bar fill
-    health_ratio = enemy_health / enemy_max_health
-    health_bar_width = enemy_size * health_ratio
-
-    pygame.draw.rect(
-        screen,
-        (0, 255, 0),
-        (enemy_x, enemy_y - 15, health_bar_width, 8)
-    )
-
-    # Draw enemy text if the timer is active
-    if enemy_text_timer > 0:
-        text_surface = font.render(enemy_text, True, (255, 255, 255))
-
-        screen.blit(
-            text_surface,
-            (enemy_x, enemy_y - 40)
-        )
-    pygame.display.flip()
-    # Limit the game to 60 frames per second
-    clock.tick(60)
-
-# Quit pygame and clean up resources
-pygame.quit()
+if __name__ == "__main__":
+    run_game()

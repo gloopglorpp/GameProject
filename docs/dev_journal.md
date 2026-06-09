@@ -199,5 +199,37 @@ Looking back, Git and GitHub felt like a completely separate skill from programm
 - Version control makes it easier to experiment and recover from mistakes.
 - Software development involves managing code as well as writing it.
 
+## 2026-06-09 — Connecting the Visual Game Entry Point
+
+After building several separate pieces of the project, I reached a point where the repository contained two different versions of the game. The older version was a text-based combat loop that ran in the terminal, while the newer version was a Pygame window with movement, collision, enemy health, and simple attacking.
+
+The main problem was that `main.py` still started the terminal version. This meant the project did not immediately launch the most recent playable version when run. To fix this, I changed the project so that `main.py` starts the Pygame game instead.
+
+I also reorganised the Pygame code into a `run_game()` function. Before this, the game loop lived directly at the top level of the file. That works when the file is run by itself, but it is less flexible because importing the file can immediately start the game. By placing the game loop inside a function, the project can choose when to start the game more clearly.
+
+This introduced a useful Python pattern:
+
+```python
+if __name__ == "__main__":
+    run_game()
+```
+
+This check means the game starts when the file is run directly, but the code can still be imported by another file without immediately opening the game window. It is a small change, but it makes the project easier to grow as more systems are added.
+
+While updating the entry point, I also improved the current playable loop. Attacking can now be done with either the Space key or the left mouse button while touching the enemy. The Escape key can close the game, and the R key can respawn the enemy after it has been defeated. Small control hints were added on screen so the current controls are visible while testing.
+
+I also updated the README and task list so the documentation matches the actual state of the game. This was a good reminder that a project is not only the code itself. The notes, task list, and run instructions all help explain what exists, what has changed, and what should come next.
+
+Looking back, this stage was less about adding a brand-new mechanic and more about connecting the project properly. The game already had movement and enemy combat, but the project needed a clear starting point. Now running the project opens the visual game directly, which makes future development feel much more natural.
+
+### Lessons Learned
+
+- A project can contain working code that is not actually connected to the main entry point.
+- `main.py` is often used as the clear starting place for a Python program.
+- Putting a game loop inside a function makes the code easier to reuse and test.
+- The `if __name__ == "__main__"` pattern controls what happens when a file is run directly.
+- Small controls such as quit, attack, and respawn make testing faster.
+- Documentation should be updated when the playable state of the game changes.
+- A good entry point makes a project easier to run, understand, and continue developing.
 
 

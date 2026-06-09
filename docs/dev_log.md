@@ -58,3 +58,18 @@
 - Added state-based enemy dialogue reactions
 - Learned how game objects transition between alive and dead states
 - Implemented delayed death effects using timers
+
+2026-06-09
+
+- Reconnected the project entry point to the Pygame version of the game
+- Replaced the old terminal combat startup with the visual game loop
+- Moved the Pygame loop into a reusable run_game() function
+- Kept game startup protected with an if __name__ == "__main__" check
+- Added Space key attacks alongside left mouse click attacks
+- Added Escape key support for quitting the game
+- Added R key support for respawning a defeated enemy
+- Added small on-screen control hints
+- Cleaned up repeated enemy death drawing logic
+- Updated README controls and run instructions
+- Updated the task list to show completed enemy combat milestones
+- Verified the project with Python compile and Pygame startup checks

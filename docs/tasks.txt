@@ -1,7 +1,11 @@
-[ ] Create game window
-[ ] Display player on screen
-[ ] Move player with keyboard
-[ ] Spawn one enemy
-[ ] Attack enemy
-[ ] Enemy loses health
-[ ] Enemy dies
+[x] Create game window
+[x] Display player on screen
+[x] Move player with keyboard
+[x] Spawn one enemy
+[x] Attack enemy
+[x] Enemy loses health
+[x] Enemy dies
+[ ] Add player health
+[ ] Add enemy attacks
+[ ] Add inventory
+[ ] Add loot drops
