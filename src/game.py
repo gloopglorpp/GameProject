@@ -131,8 +131,8 @@ def draw_controls_menu(screen, title_font, button_font, small_font):
 
     controls = [
         "A / D: move",
-        "W / Up: jump",
-        "Space / left click: attack while touching enemy",
+        "Space: jump",
+        "Left click: attack while touching enemy",
         "R: respawn defeated enemy",
         "Esc: pause or return",
     ]
@@ -218,10 +218,8 @@ def run_game(max_frames=None):
                 if game_state == "playing":
                     if event.key == pygame.K_ESCAPE:
                         game_state = "paused"
-                    elif event.key in (pygame.K_w, pygame.K_UP):
-                        jump_pressed = True
                     elif event.key == pygame.K_SPACE:
-                        attack_pressed = True
+                        jump_pressed = True
                     elif event.key == pygame.K_r and enemy_health == 0:
                         enemy_health = enemy_max_health
                         enemy_text = "Back for more!"
@@ -233,7 +231,7 @@ def run_game(max_frames=None):
                         selected_pause_option = (selected_pause_option - 1) % 3
                     elif event.key in (pygame.K_s, pygame.K_DOWN):
                         selected_pause_option = (selected_pause_option + 1) % 3
-                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    elif event.key == pygame.K_RETURN:
                         if selected_pause_option == 0:
                             game_state = "playing"
                         elif selected_pause_option == 1:
@@ -241,7 +239,7 @@ def run_game(max_frames=None):
                         else:
                             running = False
                 elif game_state == "controls":
-                    if event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
+                    if event.key in (pygame.K_ESCAPE, pygame.K_RETURN):
                         game_state = "paused"
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if game_state == "playing":

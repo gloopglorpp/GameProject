@@ -277,3 +277,20 @@ This was also the first step toward proper interface controls. The pause menu ca
 - Moving controls into a menu keeps the main play screen cleaner.
 - Menu buttons need shared positions so drawing and clicking use the same rectangles.
 
+
+## 2026-06-09 — Refining Player Controls
+
+After testing the jump and pause menu, I adjusted the controls to feel more natural. Space is now used for jumping, which is a common platformer control and feels better than using W for vertical movement. Attacking is now kept on the left mouse button, which avoids Space trying to do two different actions during gameplay.
+
+I also kept menu selection simple. The pause menu can be navigated with W/S or the arrow keys, and options can be selected with Enter or by clicking them with the mouse. This keeps keyboard and mouse menu input working without making the gameplay controls confusing.
+
+This was a small change, but it was an important reminder that controls are part of game design. A feature can work technically but still need adjustment once it is tested in the flow of the game.
+
+### Lessons Learned
+
+- Controls should be adjusted when they feel awkward in play.
+- Space is a natural jump key for a side-view game.
+- One key should avoid doing multiple gameplay actions at the same time.
+- Menu controls and gameplay controls can use different input rules.
+- Small control refinements are worth documenting because they explain design decisions.
+

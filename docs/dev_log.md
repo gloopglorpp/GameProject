@@ -90,3 +90,8 @@
 - Added mouse clicking for pause menu buttons
 - Moved gameplay controls off the main screen and into the Controls menu
 - Learned how a game state can pause gameplay updates while still drawing the scene
+
+- Changed jump from W/Up to Space
+- Kept enemy attacks on left mouse click only
+- Kept Enter and mouse click as pause menu selection controls
+- Updated the controls menu and README to match the new input layout
