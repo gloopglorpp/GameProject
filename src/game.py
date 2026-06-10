@@ -63,7 +63,7 @@ BACKGROUND_LAYER_SPECS = [
     {"name": "far_trees", "filename": "far_trees.png", "speed": 0.08, "drift": 0.0, "tile": True},
     {"name": "fog", "filename": "fog.png", "speed": 0.04, "drift": 0.18, "tile": True},
     {"name": "mid_trees", "filename": "mid_trees.png", "speed": 0.18, "drift": 0.0, "tile": True},
-    {"name": "shack", "filename": "shack.png", "speed": 0.28, "drift": 0.0, "tile": True},
+    {"name": "shack", "filename": "shack.png", "speed": 0.28, "drift": 0.0, "tile": True, "width_ratio": 0.42, "align": "bottom", "spacing": 1900},
     {"name": "foreground", "filename": "foreground.png", "speed": 0.55, "drift": 0.0, "tile": True},
 ]
 BACKGROUND_PLACEHOLDER_COLORS = {
@@ -94,10 +94,16 @@ def create_placeholder_background_layer(layer_name):
     return surface
 
 
-def scale_background_layer(image):
+def scale_background_layer(image, spec):
     width, height = image.get_size()
-    scale = max(SCREEN_WIDTH / width, SCREEN_HEIGHT / height)
-    scaled_size = (max(SCREEN_WIDTH, int(width * scale)), max(SCREEN_HEIGHT, int(height * scale)))
+
+    if "width_ratio" in spec:
+        target_width = int(SCREEN_WIDTH * spec["width_ratio"])
+        scale = target_width / width
+    else:
+        scale = max(SCREEN_WIDTH / width, SCREEN_HEIGHT / height)
+
+    scaled_size = (max(1, int(width * scale)), max(1, int(height * scale)))
 
     if scaled_size == image.get_size():
         return image
@@ -116,33 +122,52 @@ def load_background_layers():
             image = create_placeholder_background_layer(spec["name"])
 
         layers.append({
-            "image": scale_background_layer(image),
+            "image": scale_background_layer(image, spec),
             "speed": spec["speed"],
             "drift": spec["drift"],
             "tile": spec["tile"],
+            "align": spec.get("align", "top"),
+            "spacing": spec.get("spacing"),
         })
 
     return layers
 
 
-def draw_background_layer(screen, image, offset, tile):
+def get_background_layer_y(image, align):
+    if align == "bottom":
+        return SCREEN_HEIGHT - image.get_height()
+
+    return 0
+
+
+def draw_background_layer(screen, image, offset, tile, align, spacing=None):
+    y = get_background_layer_y(image, align)
+
     if not tile:
-        screen.blit(image, (0, 0))
+        screen.blit(image, (0, y))
         return
 
     image_width = image.get_width()
-    start_x = -int(offset % image_width)
+    repeat_width = spacing or image_width
+    start_x = -int(offset % repeat_width)
     x = start_x
 
     while x < SCREEN_WIDTH:
-        screen.blit(image, (x, 0))
-        x += image_width
+        screen.blit(image, (x, y))
+        x += repeat_width
 
 
 def draw_background(screen, background_layers, world_x, background_time):
     for layer in background_layers:
         offset = world_x * layer["speed"] + background_time * layer["drift"]
-        draw_background_layer(screen, layer["image"], offset, layer["tile"])
+        draw_background_layer(
+            screen,
+            layer["image"],
+            offset,
+            layer["tile"],
+            layer["align"],
+            layer["spacing"],
+        )
 
 
 def get_pause_buttons():

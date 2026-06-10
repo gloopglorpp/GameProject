@@ -30,6 +30,9 @@
 [x] Load background PNGs with pygame.image.load().convert_alpha()
 [x] Add parallax scrolling speeds for background image layers
 [x] Add temporary placeholder PNG assets for future replacement
+[x] Replace mid_trees, shack, and foreground placeholders with real PNG artwork
+[x] Convert the shack checkerboard background into transparency
+[x] Tune asset scaling for real foreground and shack layers
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu

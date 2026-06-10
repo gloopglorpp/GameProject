@@ -1,12 +1,12 @@
 # Background Assets
 
-Replace these placeholder PNG files with final artwork when ready:
+The game loads these PNG files in order:
 
-- `sky.png`
-- `far_trees.png`
-- `fog.png`
-- `mid_trees.png`
-- `shack.png`
-- `foreground.png`
+- `sky.png` placeholder
+- `far_trees.png` placeholder
+- `fog.png` placeholder
+- `mid_trees.png` real imported forest art
+- `shack.png` real imported shack art, converted to transparency from a checkerboard source
+- `foreground.png` real imported foreground art
 
-The game loads these files as layered images. Transparent PNGs should use alpha, and the code will scale layers to fit the 1280x720 window if needed.
+Replace any placeholder PNGs with final artwork when ready. Transparent layers should be saved as PNGs with alpha, and the code will scale layers to fit the 1280x720 window if needed.

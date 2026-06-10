@@ -185,3 +185,10 @@
 - Kept player, collision, enemy, and combat code separate from background art
 - Added asset README notes explaining which PNG files can be replaced later
 - Learned why art assets should live outside gameplay code once the visual direction becomes more serious
+
+- Replaced the placeholder `mid_trees.png`, `shack.png`, and `foreground.png` files with imported artwork
+- Converted the shack file's checkerboard background into transparency so it behaves like a proper PNG overlay
+- Added per-layer scaling metadata so the shack can be drawn as a smaller scene object
+- Kept the existing image-layer background order and parallax system intact
+- Left `sky.png`, `far_trees.png`, and `fog.png` as temporary placeholders until final art is available
+- Verified the real PNG layers load through the existing Pygame asset pipeline

@@ -535,3 +535,23 @@ Temporary placeholder PNGs were added so the game can run immediately. They are 
 - Parallax can be controlled with layer metadata instead of hardcoded drawing functions.
 - Placeholder assets are useful when they prove the pipeline without pretending to be final art.
 - Separating background art from collision and player logic keeps the game easier to grow.
+
+## 2026-06-10 — Replacing Placeholder Background Layers With Real Art
+
+After creating the PNG-based background pipeline, the next step was to start swapping placeholder files for real artwork. This is the point where the asset system begins to prove its value: the code already knew how to load named layers, so replacing a layer mostly meant replacing the file in `assets/backgrounds/`.
+
+The `mid_trees.png`, `shack.png`, and `foreground.png` files were replaced with imported artwork. The game still draws them in the same order as before, so the background pipeline did not need to be redesigned. This keeps the change focused on assets instead of mixing artwork replacement with unrelated gameplay work.
+
+One practical issue appeared with the shack image. The file looked like it had transparency, but the checkerboard was actually baked into the image pixels. To make it work as a proper overlay, the light checkerboard pixels were converted into transparent alpha. This lets the shack sit over the forest background instead of carrying a visible fake transparency pattern.
+
+The shack also needed different scaling from the full-screen forest layers. Background art such as `mid_trees.png` and `foreground.png` can fill the window, but the shack is more like a scene object. The background layer system now supports per-layer sizing metadata so the shack can be scaled smaller while still participating in parallax.
+
+The remaining `sky.png`, `far_trees.png`, and `fog.png` files are still placeholders. That is fine for now because the structure is in place. When final versions of those layers are ready, they can be dropped into the same folder with the same filenames.
+
+### Lessons Learned
+
+- A good asset pipeline makes real art replacement much easier.
+- Image filenames can act like a contract between the code and the art folder.
+- Not every PNG with a checkerboard preview actually has transparency.
+- Some layers need full-screen scaling, while object-like layers may need custom sizing.
+- Replacing art assets can be a clean milestone when the gameplay code stays untouched.

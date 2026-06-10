@@ -11,7 +11,8 @@ A small Python/Pygame game project built as a learning exercise.
 - Loads the background from external PNG image layers in `assets/backgrounds/`
 - Draws sky, far trees, fog, mid trees, shack, and foreground as separate assets
 - Uses simple parallax scrolling speeds for the image layers
-- Includes temporary placeholder PNGs that can be replaced with final artwork
+- Uses real imported PNG art for `mid_trees.png`, `shack.png`, and `foreground.png`
+- Keeps placeholder PNGs for `sky.png`, `far_trees.png`, and `fog.png` until final versions are added
 - Draws the player as a small cloaked silhouette with a warm lantern glow
 - Keeps the older zombie, fireball, death effect, and respawn systems in the code for later combat milestones
 
