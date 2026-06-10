@@ -1,12 +1,9 @@
 # Background Assets
 
-The game loads these PNG files in order:
+The current opening scene uses one active background image:
 
-- `sky.png` placeholder
-- `far_trees.png` placeholder
-- `fog.png` placeholder
-- `mid_trees.png` real imported forest art
-- `shack.png` real imported shack art, converted to transparency from a checkerboard source
-- `foreground.png` real imported foreground art
+- `sky.png`
 
-Replace any placeholder PNGs with final artwork when ready. Transparent layers should be saved as PNGs with alpha, and the code will scale layers to fit the 1280x720 window if needed.
+The game scales `sky.png` to the 1280x720 window and draws it as the full scene. The character walks directly across the black grass already painted into this image.
+
+Other PNGs may remain in this folder from earlier experiments, but they are not currently loaded by `BACKGROUND_LAYER_SPECS` in `src/game.py`.

@@ -555,3 +555,21 @@ The remaining `sky.png`, `far_trees.png`, and `fog.png` files are still placehol
 - Not every PNG with a checkerboard preview actually has transparency.
 - Some layers need full-screen scaling, while object-like layers may need custom sizing.
 - Replacing art assets can be a clean milestone when the gameplay code stays untouched.
+
+## 2026-06-10 — Using One Full-Scene Background Artwork
+
+After trying a multi-layer PNG background, I decided the opening scene should use a single complete piece of artwork for now. The new `sky.png` already contains the sunset, distant hills, tree silhouettes, fog, and black grass foreground. Because those elements are already composed inside the image, drawing extra background layers on top would make the scene busier than it needs to be.
+
+The active background list now contains only `sky.png`. The older PNG files can remain in the assets folder, but the game does not load them for the current opening scene. This keeps the code simple and makes it clear that the art direction is coming from one strong image.
+
+The ground line was moved down to match the black grass in the artwork. This matters because the character should feel like they belong inside the picture, not like they are floating above it or standing below the visible ground. I estimated the dark grass line after the image was scaled to the 1280x720 game window and set `GROUND_Y` to that level.
+
+Movement changed too. With a single static background image, the old side-scrolling approach made the character stay in one place while the background did not visibly move. For this opening scene, the player now walks directly across the screen. That makes the character visibly travel along the black grass, which fits this quieter scene better.
+
+### Lessons Learned
+
+- A single well-composed image can be stronger than several weaker layers.
+- The ground collision line should match the visible ground in the artwork.
+- Movement style depends on the background style: a static scene benefits from direct screen movement.
+- Keeping older assets inactive is different from deleting them; they can still be reused later.
+- A simpler background setup can make the opening scene feel more focused.

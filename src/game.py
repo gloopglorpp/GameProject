@@ -55,24 +55,14 @@ SMOKE_COLORS = [
     (120, 122, 116),
 ]
 
-GROUND_Y = 610
+GROUND_Y = 696
 
 BACKGROUND_DIR = Path(__file__).resolve().parent.parent / "assets" / "backgrounds"
 BACKGROUND_LAYER_SPECS = [
     {"name": "sky", "filename": "sky.png", "speed": 0.0, "drift": 0.0, "tile": False},
-    {"name": "far_trees", "filename": "far_trees.png", "speed": 0.08, "drift": 0.0, "tile": True},
-    {"name": "fog", "filename": "fog.png", "speed": 0.04, "drift": 0.18, "tile": True},
-    {"name": "mid_trees", "filename": "mid_trees.png", "speed": 0.18, "drift": 0.0, "tile": True},
-    {"name": "shack", "filename": "shack.png", "speed": 0.28, "drift": 0.0, "tile": True, "width_ratio": 0.42, "align": "bottom", "spacing": 1900},
-    {"name": "foreground", "filename": "foreground.png", "speed": 0.55, "drift": 0.0, "tile": True},
 ]
 BACKGROUND_PLACEHOLDER_COLORS = {
     "sky": (178, 90, 62, 255),
-    "far_trees": (65, 45, 52, 92),
-    "fog": (255, 207, 150, 72),
-    "mid_trees": (36, 28, 31, 132),
-    "shack": (22, 17, 15, 105),
-    "foreground": (11, 12, 10, 165),
 }
 TEXT_COLOR = (235, 238, 245)
 MUTED_TEXT_COLOR = (155, 165, 180)
@@ -561,11 +551,17 @@ def run_game(max_frames=None):
             player_is_moving = False
 
             if keys[pygame.K_a]:
-                world_x = max(0, world_x - PLAYER_SPEED)
+                if OPENING_SCENE_MODE:
+                    player_rect.x = max(20, player_rect.x - PLAYER_SPEED)
+                else:
+                    world_x = max(0, world_x - PLAYER_SPEED)
                 player_facing = -1
                 player_is_moving = True
             if keys[pygame.K_d]:
-                world_x += PLAYER_SPEED
+                if OPENING_SCENE_MODE:
+                    player_rect.x = min(SCREEN_WIDTH - PLAYER_SIZE - 20, player_rect.x + PLAYER_SPEED)
+                else:
+                    world_x += PLAYER_SPEED
                 player_facing = 1
                 player_is_moving = True
 
@@ -574,7 +570,8 @@ def run_game(max_frames=None):
             else:
                 player_animation_frame = 0
 
-            player_rect.x = PLAYER_SCREEN_X
+            if not OPENING_SCENE_MODE:
+                player_rect.x = PLAYER_SCREEN_X
 
             if jump_pressed and player_rect.bottom == GROUND_Y:
                 player_y_velocity = JUMP_STRENGTH

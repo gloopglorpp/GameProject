@@ -192,3 +192,10 @@
 - Kept the existing image-layer background order and parallax system intact
 - Left `sky.png`, `far_trees.png`, and `fog.png` as temporary placeholders until final art is available
 - Verified the real PNG layers load through the existing Pygame asset pipeline
+
+- Replaced the active background with the supplied `sky.png` sunset artwork
+- Changed the background layer spec so only `sky.png` is drawn for the opening scene
+- Moved `GROUND_Y` down to the black grass line in the new artwork
+- Changed opening-scene movement so the player walks across the screen instead of staying fixed while the world scrolls
+- Kept enemies, fireballs, and older background assets inactive for the quiet opening scene
+- Updated README, tasks, and background asset notes to describe the single-image setup

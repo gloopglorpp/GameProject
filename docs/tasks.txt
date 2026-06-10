@@ -33,6 +33,10 @@
 [x] Replace mid_trees, shack, and foreground placeholders with real PNG artwork
 [x] Convert the shack checkerboard background into transparency
 [x] Tune asset scaling for real foreground and shack layers
+[x] Replace the active background with the supplied single `sky.png` artwork
+[x] Disable the older multi-layer background draw order for the opening scene
+[x] Move the opening-scene ground line onto the black grass in the artwork
+[x] Make the opening-scene character walk directly across the screen
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu
