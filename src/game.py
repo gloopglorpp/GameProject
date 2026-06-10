@@ -26,12 +26,6 @@ SPARKLE_COLOR = (255, 184, 91)
 STAFF_COLOR = (96, 62, 35)
 STAFF_GLOW_COLOR = (255, 158, 70)
 
-FIREFLY_COUNT_MIN = 3
-FIREFLY_COUNT_MAX = 6
-FIREFLY_GLOW_COLOR = (255, 170, 77)
-FIREFLY_CORE_COLOR = (255, 232, 145)
-FIREFLY_DART_CHANCE = 0.012
-
 FIREBALL_SPEED = 9
 FIREBALL_RADIUS = 8
 FIREBALL_LIFETIME = 90
@@ -299,98 +293,6 @@ def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, 
     pygame.draw.circle(screen, (240, 170, 92), (eye_x, head_center[1] - 1), 1)
 
 
-def get_player_head_target(player_rect):
-    return player_rect.centerx, player_rect.y + 10
-
-
-def create_fireflies(player_rect):
-    head_x, head_y = get_player_head_target(player_rect)
-    fireflies = []
-
-    for index in range(random.randint(FIREFLY_COUNT_MIN, FIREFLY_COUNT_MAX)):
-        angle = random.uniform(0, math.tau)
-        radius = random.uniform(18, 48)
-        fireflies.append({
-            "x": head_x + math.cos(angle) * radius,
-            "y": head_y + math.sin(angle) * radius * 0.55,
-            "angle": angle,
-            "orbit_radius": radius,
-            "orbit_speed": random.uniform(0.018, 0.044) * random.choice((-1, 1)),
-            "vertical_scale": random.uniform(0.42, 0.72),
-            "follow_strength": random.uniform(0.055, 0.095),
-            "jitter_phase": random.uniform(0, math.tau),
-            "jitter_speed": random.uniform(0.06, 0.14),
-            "jitter_amount": random.uniform(1.5, 4.5),
-            "pulse_phase": random.uniform(0, math.tau),
-            "pulse_speed": random.uniform(0.055, 0.11),
-            "dart_timer": 0,
-            "dart_duration": 1,
-            "dart_mode": "orbit",
-            "dart_cooldown": random.randint(35, 120) + index * 11,
-            "size": random.uniform(1.7, 2.8),
-        })
-
-    return fireflies
-
-
-def get_firefly_dart_scale(firefly):
-    if firefly["dart_timer"] <= 0:
-        return 1.0
-
-    progress = 1 - firefly["dart_timer"] / firefly["dart_duration"]
-    dart_curve = math.sin(progress * math.pi)
-
-    if firefly["dart_mode"] == "toward":
-        return 1.0 - dart_curve * 0.78
-
-    return 1.0 + dart_curve * 0.62
-
-
-def update_fireflies(fireflies, player_rect):
-    head_x, head_y = get_player_head_target(player_rect)
-
-    for firefly in fireflies:
-        firefly["angle"] += firefly["orbit_speed"]
-        firefly["jitter_phase"] += firefly["jitter_speed"]
-
-        if firefly["dart_timer"] > 0:
-            firefly["dart_timer"] -= 1
-        else:
-            firefly["dart_cooldown"] -= 1
-            if firefly["dart_cooldown"] <= 0 or random.random() < FIREFLY_DART_CHANCE:
-                firefly["dart_duration"] = random.randint(14, 28)
-                firefly["dart_timer"] = firefly["dart_duration"]
-                firefly["dart_mode"] = random.choice(("toward", "toward", "away"))
-                firefly["dart_cooldown"] = random.randint(75, 180)
-
-        radius = firefly["orbit_radius"] * get_firefly_dart_scale(firefly)
-        orbit_x = math.cos(firefly["angle"]) * radius
-        orbit_y = math.sin(firefly["angle"] * 1.17 + firefly["pulse_phase"]) * radius * firefly["vertical_scale"]
-        jitter_x = math.sin(firefly["jitter_phase"] * 1.7) * firefly["jitter_amount"] + random.uniform(-1.2, 1.2)
-        jitter_y = math.cos(firefly["jitter_phase"] * 1.3) * firefly["jitter_amount"] + random.uniform(-1.0, 1.0)
-
-        target_x = head_x + orbit_x + jitter_x
-        target_y = head_y - 4 + orbit_y + jitter_y
-        firefly["x"] += (target_x - firefly["x"]) * firefly["follow_strength"]
-        firefly["y"] += (target_y - firefly["y"]) * firefly["follow_strength"]
-
-
-def draw_player_fireflies(screen, fireflies, background_time):
-    for firefly in fireflies:
-        pulse = 0.68 + math.sin(background_time * firefly["pulse_speed"] + firefly["pulse_phase"]) * 0.32
-        glow_radius = max(8, int(15 * pulse + firefly["size"] * 3))
-        glow = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
-        glow_alpha = int(72 + 46 * pulse)
-        pygame.draw.circle(glow, (*FIREFLY_GLOW_COLOR, glow_alpha), (glow_radius, glow_radius), glow_radius)
-        pygame.draw.circle(glow, (*FIREFLY_GLOW_COLOR, glow_alpha // 2), (glow_radius, glow_radius), glow_radius // 2)
-
-        x = int(firefly["x"])
-        y = int(firefly["y"])
-        screen.blit(glow, (x - glow_radius, y - glow_radius))
-        pygame.draw.circle(screen, FIREFLY_CORE_COLOR, (x, y), max(1, int(firefly["size"])))
-        pygame.draw.circle(screen, (255, 190, 88), (x, y), 1)
-
-
 def draw_fireball(screen, fireball, world_x):
     screen_x = int(fireball["x"] - world_x + PLAYER_SCREEN_X)
     y = int(fireball["y"])
@@ -572,7 +474,6 @@ def run_game(max_frames=None):
     player_animation_frame = 0
     player_is_moving = False
     fireballs = []
-    fireflies = create_fireflies(player_rect)
     world_x = 0
     background_time = 0
     selected_pause_option = 0
@@ -695,8 +596,6 @@ def run_game(max_frames=None):
                     "age": 0,
                 })
 
-            update_fireflies(fireflies, player_rect)
-
             if OPENING_SCENE_MODE:
                 fireballs.clear()
 
@@ -735,7 +634,6 @@ def run_game(max_frames=None):
             player_is_jumping,
             background_time,
         )
-        draw_player_fireflies(screen, fireflies, background_time)
         if not OPENING_SCENE_MODE and enemy_health > 0 and -ENEMY_SIZE <= enemy_rect.x <= SCREEN_WIDTH:
             draw_zombie(screen, enemy_rect, enemy_health, enemy_max_health, background_time)
 

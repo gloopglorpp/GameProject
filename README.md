@@ -11,7 +11,6 @@ A small Python/Pygame game project built as a learning exercise.
 - Lets the player walk directly across the screen in the opening scene
 - Lets the player jump with simple gravity
 - Draws the player as a small cloaked silhouette with a warm lantern glow
-- Adds a small group of amber fireflies that orbit, follow, pulse, and dart around the player
 - Keeps the older zombie, fireball, death effect, and respawn systems in the code for later combat milestones
 
 ## Background Assets
