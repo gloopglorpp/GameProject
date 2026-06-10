@@ -8,12 +8,25 @@ A small Python/Pygame game project built as a learning exercise.
 - Presents a calm cinematic opening scene without enemies on screen
 - Moves the player left and right slowly along the ground
 - Lets the player jump with simple gravity
-- Draws a warm forest silhouette scene with sunset light, fog, and deep shadows
-- Uses parallax hills, distant trees, mist, canopy, grass, and drifting fireflies
-- Adds a detailed abandoned shack silhouette and broken fence
-- Adds a huge foreground tree with roots, heavy branches, and a rope swing
+- Loads the background from external PNG image layers in `assets/backgrounds/`
+- Draws sky, far trees, fog, mid trees, shack, and foreground as separate assets
+- Uses simple parallax scrolling speeds for the image layers
+- Includes temporary placeholder PNGs that can be replaced with final artwork
 - Draws the player as a small cloaked silhouette with a warm lantern glow
 - Keeps the older zombie, fireball, death effect, and respawn systems in the code for later combat milestones
+
+## Background Assets
+
+The background is loaded from these PNG files:
+
+- `assets/backgrounds/sky.png`
+- `assets/backgrounds/far_trees.png`
+- `assets/backgrounds/fog.png`
+- `assets/backgrounds/mid_trees.png`
+- `assets/backgrounds/shack.png`
+- `assets/backgrounds/foreground.png`
+
+Replace the placeholder PNGs with final art using the same filenames. Transparent layers should be saved as PNGs with alpha.
 
 ## Controls
 

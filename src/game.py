@@ -1,5 +1,6 @@
 import math
 import random
+from pathlib import Path
 
 import pygame
 
@@ -56,27 +57,23 @@ SMOKE_COLORS = [
 
 GROUND_Y = 610
 
-SKY_TOP_COLOR = (64, 42, 54)
-SKY_MID_COLOR = (182, 82, 58)
-SKY_BOTTOM_COLOR = (255, 175, 76)
-SUN_GLOW_COLOR = (255, 194, 85, 58)
-MIST_COLOR = (255, 211, 154, 34)
-DISTANT_TREE_COLOR = (75, 52, 55, 62)
-MID_TREE_COLOR = (46, 35, 36, 118)
-DISTANT_HILL_COLOR = (85, 64, 60, 88)
-MID_HILL_COLOR = (48, 38, 35, 155)
-SHACK_COLOR = (20, 17, 16, 225)
-SHACK_DETAIL_COLOR = (91, 60, 42, 130)
-SHACK_WINDOW_COLOR = (255, 177, 82, 92)
-TREE_FAR_COLOR = (31, 25, 23, 190)
-TREE_NEAR_COLOR = (9, 9, 8, 248)
-CANOPY_COLOR = (12, 10, 10, 225)
-GRASS_COLOR = (33, 39, 30)
-GROUND_COLOR = (18, 19, 17)
-GROUND_SHADOW_COLOR = (8, 9, 8)
-GRASS_HIGHLIGHT_COLOR = (105, 111, 68)
-FIREFLY_COLOR = (255, 211, 121, 118)
-VIGNETTE_COLOR = (11, 8, 10, 122)
+BACKGROUND_DIR = Path(__file__).resolve().parent.parent / "assets" / "backgrounds"
+BACKGROUND_LAYER_SPECS = [
+    {"name": "sky", "filename": "sky.png", "speed": 0.0, "drift": 0.0, "tile": False},
+    {"name": "far_trees", "filename": "far_trees.png", "speed": 0.08, "drift": 0.0, "tile": True},
+    {"name": "fog", "filename": "fog.png", "speed": 0.04, "drift": 0.18, "tile": True},
+    {"name": "mid_trees", "filename": "mid_trees.png", "speed": 0.18, "drift": 0.0, "tile": True},
+    {"name": "shack", "filename": "shack.png", "speed": 0.28, "drift": 0.0, "tile": True},
+    {"name": "foreground", "filename": "foreground.png", "speed": 0.55, "drift": 0.0, "tile": True},
+]
+BACKGROUND_PLACEHOLDER_COLORS = {
+    "sky": (178, 90, 62, 255),
+    "far_trees": (65, 45, 52, 92),
+    "fog": (255, 207, 150, 72),
+    "mid_trees": (36, 28, 31, 132),
+    "shack": (22, 17, 15, 105),
+    "foreground": (11, 12, 10, 165),
+}
 TEXT_COLOR = (235, 238, 245)
 MUTED_TEXT_COLOR = (155, 165, 180)
 MENU_OVERLAY_COLOR = (12, 16, 18, 175)
@@ -91,264 +88,61 @@ def draw_text(screen, font, text, x, y, color=TEXT_COLOR):
     screen.blit(text_surface, (x, y))
 
 
-def blend_color(start_color, end_color, amount):
-    return tuple(
-        int(start + (end - start) * amount)
-        for start, end in zip(start_color, end_color)
-    )
+def create_placeholder_background_layer(layer_name):
+    surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    surface.fill(BACKGROUND_PLACEHOLDER_COLORS[layer_name])
+    return surface
 
 
-def draw_sky_gradient(screen):
-    for y in range(SCREEN_HEIGHT):
-        if y < SCREEN_HEIGHT * 0.48:
-            amount = y / (SCREEN_HEIGHT * 0.48)
-            color = blend_color(SKY_TOP_COLOR, SKY_MID_COLOR, amount)
+def scale_background_layer(image):
+    width, height = image.get_size()
+    scale = max(SCREEN_WIDTH / width, SCREEN_HEIGHT / height)
+    scaled_size = (max(SCREEN_WIDTH, int(width * scale)), max(SCREEN_HEIGHT, int(height * scale)))
+
+    if scaled_size == image.get_size():
+        return image
+
+    return pygame.transform.smoothscale(image, scaled_size)
+
+
+def load_background_layers():
+    layers = []
+
+    for spec in BACKGROUND_LAYER_SPECS:
+        path = BACKGROUND_DIR / spec["filename"]
+        if path.exists():
+            image = pygame.image.load(path).convert_alpha()
         else:
-            amount = (y - SCREEN_HEIGHT * 0.48) / (SCREEN_HEIGHT * 0.52)
-            color = blend_color(SKY_MID_COLOR, SKY_BOTTOM_COLOR, amount)
-        pygame.draw.line(screen, color, (0, y), (SCREEN_WIDTH, y))
+            image = create_placeholder_background_layer(spec["name"])
+
+        layers.append({
+            "image": scale_background_layer(image),
+            "speed": spec["speed"],
+            "drift": spec["drift"],
+            "tile": spec["tile"],
+        })
+
+    return layers
 
 
-def draw_sun_glow(screen, background_time):
-    glow = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    pulse = math.sin(background_time * 0.01) * 7
-    center = (SCREEN_WIDTH // 2 + 35, int(GROUND_Y * 0.54))
+def draw_background_layer(screen, image, offset, tile):
+    if not tile:
+        screen.blit(image, (0, 0))
+        return
 
-    for index, radius in enumerate((430, 340, 250, 168, 92)):
-        alpha = max(7, SUN_GLOW_COLOR[3] - index * 8)
-        pygame.draw.circle(glow, (*SUN_GLOW_COLOR[:3], alpha), center, int(radius + pulse))
+    image_width = image.get_width()
+    start_x = -int(offset % image_width)
+    x = start_x
 
-    screen.blit(glow, (0, 0))
-
-
-def parallax_x(base_x, world_x, speed, spacing):
-    return (base_x - world_x * speed) % spacing - spacing * 0.08
+    while x < SCREEN_WIDTH:
+        screen.blit(image, (x, 0))
+        x += image_width
 
 
-def draw_distant_tree_layer(screen, world_x):
-    layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-
-    for index in range(18):
-        x = int((index * 165 - world_x * 0.055) % (SCREEN_WIDTH + 210) - 105)
-        trunk_width = 12 + index % 5 * 5
-        top = 88 + index % 6 * 24
-        base = GROUND_Y - 38 + index % 4 * 9
-        lean = (index % 3 - 1) * 13
-        color = DISTANT_TREE_COLOR if index % 2 else MID_TREE_COLOR
-        pygame.draw.polygon(
-            layer,
-            color,
-            [
-                (x - trunk_width, base),
-                (x + lean - trunk_width // 2, top),
-                (x + lean + trunk_width // 2, top),
-                (x + trunk_width, base),
-            ],
-        )
-
-        for branch in range(3):
-            branch_y = top + 55 + branch * 60 + index % 4 * 7
-            branch_length = 52 + branch * 18
-            direction = -1 if (index + branch) % 2 else 1
-            start = (x + lean // 2, branch_y)
-            end = (x + direction * branch_length, branch_y - 32 + branch * 8)
-            pygame.draw.line(layer, color, start, end, 3)
-
-    screen.blit(layer, (0, 0))
-
-
-def draw_hill_layer(screen, world_x, speed, color, base_y, wave_height, spacing):
-    layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    points = [(0, GROUND_Y + 18)]
-
-    for x in range(-120, SCREEN_WIDTH + 161, 80):
-        wave = math.sin((x + world_x * speed) * 0.009) * wave_height
-        y = base_y + wave
-        points.append((x, int(y)))
-
-    points.extend([(SCREEN_WIDTH, GROUND_Y + 18), (0, GROUND_Y + 18)])
-    pygame.draw.polygon(layer, color, points)
-
-    for base_x in (120, 390, 710, 1030, 1360):
-        x = parallax_x(base_x, world_x, speed, spacing)
-        pygame.draw.ellipse(layer, (*color[:3], max(14, color[3] - 30)), (x - 120, base_y - 18, 290, 82))
-
-    screen.blit(layer, (0, 0))
-
-
-def draw_mist(screen, world_x, background_time):
-    mist = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-
-    for index in range(7):
-        y = 300 + index * 34
-        width = 450 + index * 72
-        height = 56 + index * 7
-        speed = 0.045 + index * 0.012
-        x = (index * 230 - world_x * speed - background_time * 0.09) % (SCREEN_WIDTH + width) - width
-        pygame.draw.ellipse(mist, MIST_COLOR, (x, y, width, height))
-        pygame.draw.ellipse(mist, MIST_COLOR, (x + width * 0.58, y + 5, width * 0.78, height * 0.72))
-
-    screen.blit(mist, (0, 0))
-
-
-def draw_leaf_canopy(screen, world_x, background_time):
-    canopy = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-
-    for index in range(92):
-        drift = math.sin(background_time * 0.008 + index) * 3
-        x = (index * 83 - world_x * 0.18 + drift) % (SCREEN_WIDTH + 180) - 90
-        y = 8 + index * 37 % 155
-        width = 58 + index % 6 * 18
-        height = 24 + index % 5 * 9
-        alpha = 42 + index % 5 * 26
-        pygame.draw.ellipse(canopy, (*CANOPY_COLOR[:3], alpha), (x, y, width, height))
-
-    pygame.draw.rect(canopy, (*CANOPY_COLOR[:3], 90), (0, 0, SCREEN_WIDTH, 32))
-    screen.blit(canopy, (0, 0))
-
-
-def draw_shack(screen, world_x):
-    layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-
-    for base_x in (170, 2140):
-        x = int(parallax_x(base_x, world_x, 0.27, 2200))
-        y = GROUND_Y - 198
-        wall = [(x, y + 72), (x + 220, y + 56), (x + 210, y + 184), (x + 10, y + 190)]
-        roof = [(x - 28, y + 72), (x + 96, y + 10), (x + 244, y + 56), (x + 218, y + 82)]
-        doorway = [(x + 145, y + 103), (x + 185, y + 100), (x + 184, y + 184), (x + 144, y + 187)]
-        window = pygame.Rect(x + 54, y + 104, 38, 34)
-
-        pygame.draw.polygon(layer, SHACK_COLOR, wall)
-        pygame.draw.polygon(layer, (*SHACK_COLOR[:3], 245), roof)
-        pygame.draw.polygon(layer, (*GROUND_SHADOW_COLOR, 240), doorway)
-        pygame.draw.rect(layer, SHACK_WINDOW_COLOR, window, border_radius=2)
-        pygame.draw.line(layer, (*GROUND_SHADOW_COLOR, 170), window.midtop, window.midbottom, 2)
-        pygame.draw.line(layer, (*GROUND_SHADOW_COLOR, 170), window.midleft, window.midright, 2)
-
-        for plank_x in (x + 22, x + 58, x + 94, x + 132, x + 174, x + 205):
-            pygame.draw.line(layer, (*SHACK_DETAIL_COLOR[:3], 145), (plank_x, y + 75), (plank_x - 9, y + 188), 3)
-
-        for board in range(7):
-            board_x = x - 18 + board * 40
-            board_y = GROUND_Y - 62 + math.sin(board) * 6
-            pygame.draw.line(layer, (*SHACK_COLOR[:3], 200), (board_x, board_y), (board_x, GROUND_Y + 4), 5)
-            pygame.draw.line(layer, (*SHACK_COLOR[:3], 180), (board_x - 20, board_y + 18), (board_x + 28, board_y + 10), 4)
-
-        pygame.draw.line(layer, (*GROUND_SHADOW_COLOR, 190), (x + 10, y + 190), (x - 12, GROUND_Y + 9), 6)
-        pygame.draw.line(layer, (*GROUND_SHADOW_COLOR, 190), (x + 212, y + 184), (x + 238, GROUND_Y + 7), 6)
-
-    screen.blit(layer, (0, 0))
-
-
-def draw_huge_tree(screen, world_x, background_time):
-    layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-
-    x = int(parallax_x(780, world_x, 0.34, 2100))
-    root_y = GROUND_Y + 42
-    trunk = [
-        (x - 96, root_y),
-        (x - 76, 388),
-        (x - 64, 170),
-        (x - 28, -30),
-        (x + 86, -35),
-        (x + 118, 188),
-        (x + 100, 420),
-        (x + 150, root_y),
-    ]
-    pygame.draw.polygon(layer, TREE_NEAR_COLOR, trunk)
-
-    root_points = [
-        [(x - 86, GROUND_Y), (x - 205, GROUND_Y + 25), (x - 40, GROUND_Y + 30)],
-        [(x + 78, GROUND_Y), (x + 210, GROUND_Y + 16), (x + 38, GROUND_Y + 35)],
-        [(x + 8, GROUND_Y - 2), (x - 15, GROUND_Y + 42), (x + 86, GROUND_Y + 42)],
-    ]
-    for points in root_points:
-        pygame.draw.polygon(layer, TREE_NEAR_COLOR, points)
-
-    main_branches = [
-        ((x + 22, 142), (x - 360, 104), 42),
-        ((x + 28, 165), (x + 370, 78), 46),
-        ((x - 20, 225), (x - 280, 236), 26),
-        ((x + 62, 236), (x + 310, 250), 30),
-    ]
-    for start_point, end_point, width in main_branches:
-        pygame.draw.line(layer, TREE_NEAR_COLOR, start_point, end_point, width)
-        twig_a = (end_point[0] - 55, end_point[1] - 42)
-        twig_b = (end_point[0] + 68, end_point[1] + 28)
-        pygame.draw.line(layer, TREE_NEAR_COLOR, end_point, twig_a, max(5, width // 4))
-        pygame.draw.line(layer, TREE_NEAR_COLOR, end_point, twig_b, max(5, width // 5))
-
-    rope_anchor_x = x + 315
-    rope_top = (rope_anchor_x, 92)
-    sway = math.sin(background_time * 0.028) * 12
-    left_rope_bottom = (int(rope_anchor_x - 18 + sway), 374)
-    right_rope_bottom = (int(rope_anchor_x + 18 + sway), 374)
-    seat_left = (left_rope_bottom[0] - 25, left_rope_bottom[1] + 12)
-    seat_right = (right_rope_bottom[0] + 25, right_rope_bottom[1] + 12)
-    rope_color = (24, 20, 17, 245)
-    pygame.draw.line(layer, rope_color, rope_top, left_rope_bottom, 3)
-    pygame.draw.line(layer, rope_color, (rope_top[0] + 36, rope_top[1] - 3), right_rope_bottom, 3)
-    pygame.draw.line(layer, rope_color, seat_left, seat_right, 7)
-
-    screen.blit(layer, (0, 0))
-
-
-def draw_fireflies(screen, world_x, background_time):
-    firefly_layer = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-
-    for index in range(36):
-        drift = math.sin(background_time * 0.022 + index * 1.7)
-        x = (index * 89 - world_x * 0.1 + drift * 10) % (SCREEN_WIDTH + 80) - 40
-        y = 275 + (index * 47) % 250 + math.sin(background_time * 0.017 + index) * 8
-        radius = 1 + index % 2
-        pygame.draw.circle(firefly_layer, FIREFLY_COLOR, (int(x), int(y)), radius)
-
-    screen.blit(firefly_layer, (0, 0))
-
-
-def draw_foreground_ground(screen, world_x, background_time):
-    ground = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    ridge = [(0, GROUND_Y)]
-
-    for x in range(-40, SCREEN_WIDTH + 60, 36):
-        y = GROUND_Y + math.sin((x + world_x * 0.22) * 0.016) * 8
-        ridge.append((x, int(y)))
-
-    ridge.extend([(SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)])
-    pygame.draw.polygon(ground, (*GRASS_COLOR, 244), ridge)
-    pygame.draw.rect(ground, (*GROUND_COLOR, 248), (0, GROUND_Y + 26, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y))
-    pygame.draw.rect(ground, (*GROUND_SHADOW_COLOR, 250), (0, GROUND_Y + 80, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y))
-
-    for index in range(76):
-        x = int((index * 28 - world_x * 0.72) % (SCREEN_WIDTH + 90) - 45)
-        height = 10 + (index % 7) * 4 + math.sin(background_time * 0.038 + index) * 3
-        lean = -7 + index % 15
-        color = GRASS_HIGHLIGHT_COLOR if index % 4 else TREE_NEAR_COLOR[:3]
-        pygame.draw.line(ground, (*color, 188), (x, GROUND_Y + 10), (x + lean, int(GROUND_Y + 10 - height)), 2)
-
-    screen.blit(ground, (0, 0))
-
-
-def draw_vignette(screen):
-    vignette = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    pygame.draw.rect(vignette, VIGNETTE_COLOR, (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), width=38)
-    pygame.draw.rect(vignette, (*VIGNETTE_COLOR[:3], 58), (38, 38, SCREEN_WIDTH - 76, SCREEN_HEIGHT - 76), width=22)
-    screen.blit(vignette, (0, 0))
-
-
-def draw_background(screen, world_x, background_time):
-    draw_sky_gradient(screen)
-    draw_sun_glow(screen, background_time)
-    draw_distant_tree_layer(screen, world_x)
-    draw_hill_layer(screen, world_x, 0.07, DISTANT_HILL_COLOR, 430, 24, 1500)
-    draw_mist(screen, world_x, background_time)
-    draw_hill_layer(screen, world_x, 0.15, MID_HILL_COLOR, 510, 24, 1620)
-    draw_shack(screen, world_x)
-    draw_huge_tree(screen, world_x, background_time)
-    draw_leaf_canopy(screen, world_x, background_time)
-    draw_fireflies(screen, world_x, background_time)
-    draw_foreground_ground(screen, world_x, background_time)
-    draw_vignette(screen)
+def draw_background(screen, background_layers, world_x, background_time):
+    for layer in background_layers:
+        offset = world_x * layer["speed"] + background_time * layer["drift"]
+        draw_background_layer(screen, layer["image"], offset, layer["tile"])
 
 
 def get_pause_buttons():
@@ -650,6 +444,7 @@ def run_game(max_frames=None):
     font = pygame.font.Font(None, 32)
     title_font = pygame.font.Font(None, 56)
     small_font = pygame.font.Font(None, 24)
+    background_layers = load_background_layers()
 
     player_rect = pygame.Rect(PLAYER_SCREEN_X, GROUND_Y - PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE)
     enemy_world_x = 500
@@ -799,7 +594,7 @@ def run_game(max_frames=None):
 
         enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
 
-        draw_background(screen, world_x, background_time)
+        draw_background(screen, background_layers, world_x, background_time)
 
         if not OPENING_SCENE_MODE:
             draw_death_particles(screen, death_particles, world_x)

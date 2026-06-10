@@ -175,3 +175,13 @@
 - Changed the player from a bright wizard into a small cloaked silhouette with a warm lantern glow
 - Updated the controls menu and README to match the quieter opening scene
 - Learned how temporarily gating systems can let one milestone focus on art direction without deleting earlier gameplay work
+
+- Created an `assets/backgrounds/` folder for external background PNG files
+- Added placeholder PNGs for sky, far trees, fog, mid trees, shack, and foreground
+- Replaced procedural scenery drawing with an asset-based background layer system
+- Loaded PNG layers with `pygame.image.load().convert_alpha()`
+- Added scaling so background images can fit the current game window
+- Added parallax layer speeds so sky stays still while foreground moves fastest
+- Kept player, collision, enemy, and combat code separate from background art
+- Added asset README notes explaining which PNG files can be replaced later
+- Learned why art assets should live outside gameplay code once the visual direction becomes more serious

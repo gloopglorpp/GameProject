@@ -25,6 +25,11 @@
 [x] Hide enemies during the opening-scene art direction pass
 [x] Redesign player as a small cloaked silhouette
 [x] Add dense forest trees, canopy, shack details, and foreground roots
+[x] Create assets/backgrounds folder for PNG background layers
+[x] Replace procedural scenery drawing with asset-based image layers
+[x] Load background PNGs with pygame.image.load().convert_alpha()
+[x] Add parallax scrolling speeds for background image layers
+[x] Add temporary placeholder PNG assets for future replacement
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu

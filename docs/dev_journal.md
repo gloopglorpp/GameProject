@@ -512,3 +512,26 @@ The background became denser too. There are now distant tree trunks, fog layers,
 - Character design should match the world, not fight against it.
 - Dense layered silhouettes can create detail without finished image assets.
 - A milestone can focus on mood and presentation while preserving previous mechanics for later.
+
+## 2026-06-10 — Switching the Background to PNG Assets
+
+After building the warm forest scene with Pygame shapes, I decided the background needed to become a real asset pipeline. Procedural drawing was useful for learning parallax and composition, but it is not the right long-term approach for detailed artwork. If the game is going to use painterly forest scenes, shacks, fog, and silhouettes, those visuals should live as image files that can be replaced and improved over time.
+
+The project now has an `assets/backgrounds/` folder containing the background layers. The game expects six PNG files: `sky.png`, `far_trees.png`, `fog.png`, `mid_trees.png`, `shack.png`, and `foreground.png`. These are drawn in that exact order so the scene builds from the most distant layer to the closest layer.
+
+The code now loads the images with `pygame.image.load().convert_alpha()`. This is important because most of the layers will eventually need transparency. For example, fog, tree silhouettes, the shack, and foreground details should be able to sit over the sky without covering the whole screen as a solid block.
+
+The background system also scales images to fit the current window. This means placeholder art or final art can be slightly different sizes without immediately breaking the game. The layer is scaled to cover the screen, then the scrolling layers are tiled horizontally so parallax movement does not leave empty gaps.
+
+Parallax is now controlled through a small list of layer settings. The sky stays still, far trees move slowly, fog drifts gently, mid trees move a little faster, the shack moves like a midground object, and the foreground moves fastest. This keeps the background logic separate from the artwork itself.
+
+Temporary placeholder PNGs were added so the game can run immediately. They are intentionally simple coloured rectangles, not final art. The important part is the structure: replacing those files with real artwork later should not require changing the player, collision, enemy, or movement code.
+
+### Lessons Learned
+
+- Procedural drawing is useful for prototyping but not always best for final art direction.
+- A background asset pipeline makes artwork easier to replace without touching gameplay code.
+- Transparent PNG layers need `convert_alpha()` so they blend correctly in Pygame.
+- Parallax can be controlled with layer metadata instead of hardcoded drawing functions.
+- Placeholder assets are useful when they prove the pipeline without pretending to be final art.
+- Separating background art from collision and player logic keeps the game easier to grow.
