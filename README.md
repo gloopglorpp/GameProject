@@ -8,9 +8,11 @@ A small Python/Pygame game project built as a learning exercise.
 - Draws a player square
 - Moves the player left and right along the ground
 - Lets the player jump with simple gravity
-- Draws a faded sky, mountain, and grass background
+- Draws a warm, nostalgic silhouette landscape with gradient sky and fog
 - Progresses through the world with a scrolling background
-- Uses parallax clouds, mountains, and grass highlights for movement
+- Uses parallax hills, mist, landmarks, grass, and drifting fireflies for movement
+- Adds a large tree with a swaying rope swing in the background
+- Adds an abandoned shack silhouette as a repeating world landmark
 - Adds gentle background motion while the game is playing
 - Spawns a zombie enemy
 - Zombie slowly walks toward the player

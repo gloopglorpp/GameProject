@@ -152,3 +152,16 @@
 - Removed the manual R respawn control
 - Added automatic zombie respawn after the death effect clears
 - Respawned zombies off-screen ahead of the player to avoid visible pop-in
+
+2026-06-10
+
+- Replaced the simple blue sky and mountain background with a warm nostalgic silhouette scene
+- Added a sunset-style gradient sky and soft pulsing glow for atmosphere
+- Added layered parallax hills to create a stronger sense of distance
+- Added drifting mist bands so the background feels softer and deeper
+- Added a large tree silhouette with branches and a gently swaying rope swing
+- Added an abandoned shack silhouette as a repeating background landmark
+- Added small firefly-like glowing particles for warm ambient motion
+- Added a dark foreground ridge, richer grass strokes, and vignette framing
+- Kept the wizard, zombie, fireball, and respawn gameplay unchanged while improving the art direction
+- Learned how multiple simple transparent layers can create a more detailed scene without importing art assets

@@ -16,6 +16,10 @@
 [x] Keep characters fixed to the ground
 [x] Add scrolling world progression
 [x] Add moving parallax background layers
+[x] Replace simple background with warm nostalgic silhouette art direction
+[x] Add parallax tree and rope swing landmark
+[x] Add abandoned shack silhouette landmark
+[x] Add fog, glow, vignette, and firefly atmosphere
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu

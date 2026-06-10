@@ -467,3 +467,25 @@ The manual respawn key was removed. Instead, the game waits for the death effect
 - Respawning enemies off-screen prevents visible pop-in.
 - Automatic respawn can replace a testing shortcut once the game loop feels stronger.
 
+## 2026-06-10 — Warm Silhouette Background Overhaul
+
+This milestone focused on the game's overall mood and art direction. The earlier background was useful because it established sky, mountains, grass, and a shared ground line, but it still felt like a simple placeholder. The goal now was to make the scene feel more like a real place without jumping all the way into finished art assets.
+
+The visual direction moved toward a layered silhouette style inspired by atmospheric side-scrolling games, but with a warmer and more nostalgic mood. Instead of black and white, the scene now uses sunset oranges, soft browns, faded fog, and dark foreground shapes. This keeps the mysterious silhouette feeling while making the world feel calmer and more inviting.
+
+A major part of this change was breaking the background into separate drawing functions. The sky gradient, sun glow, hill layers, mist, shack, tree, fireflies, foreground ground, and vignette are all drawn by their own helpers. This makes the code longer than the old background, but each piece has a clear purpose and can be improved later without rewriting the whole scene.
+
+The large tree and rope swing are especially important because they give the world a memorable landmark. The swing gently moves over time, which helps the background feel alive even when the player is standing still. The abandoned shack serves a similar purpose in the distance. It suggests history and setting without needing dialogue or detailed story yet.
+
+Parallax is still doing a lot of the work. Different parts of the background move at different speeds as the player progresses, which creates a sense of depth. The mist and firefly layers add movement that is not tied only to player input, making the scene feel more ambient and less static.
+
+This was a useful step because it improved the game's identity while leaving the gameplay systems alone. The wizard, zombie, fireballs, death effects, and respawning all still work the same way. Only the world presentation changed, which keeps the milestone focused and easier to understand later.
+
+### Lessons Learned
+
+- A detailed mood can be built from many simple transparent shape layers.
+- Warm colours can keep a silhouette style mysterious without making it feel bleak.
+- Parallax works best when different layers have different visual roles.
+- Landmarks such as a tree, swing, or shack make a scrolling world feel more memorable.
+- Small ambient motion can make a scene feel alive even when gameplay is idle.
+- Keeping art changes separate from gameplay changes makes progress easier to study.
