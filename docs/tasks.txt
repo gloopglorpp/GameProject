@@ -20,6 +20,11 @@
 [x] Add parallax tree and rope swing landmark
 [x] Add abandoned shack silhouette landmark
 [x] Add fog, glow, vignette, and firefly atmosphere
+[x] Widen the game window for a cinematic opening scene
+[x] Slow player movement so the scene can be appreciated
+[x] Hide enemies during the opening-scene art direction pass
+[x] Redesign player as a small cloaked silhouette
+[x] Add dense forest trees, canopy, shack details, and foreground roots
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu

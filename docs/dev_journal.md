@@ -489,3 +489,26 @@ This was a useful step because it improved the game's identity while leaving the
 - Landmarks such as a tree, swing, or shack make a scrolling world feel more memorable.
 - Small ambient motion can make a scene feel alive even when gameplay is idle.
 - Keeping art changes separate from gameplay changes makes progress easier to study.
+
+## 2026-06-10 — Creating a Cinematic Opening Scene
+
+After the first warm silhouette background pass, I wanted the game to feel closer to a finished atmospheric opening scene. The reference direction had a wider frame, heavier forest silhouettes, a large tree, a rope swing, an abandoned shack, and a strong sunset glow. The goal was not to copy a single image, but to move the game toward that same feeling of warmth, depth, and quiet mystery.
+
+The first practical change was making the window wider. The game now opens at 1280x720, which gives the scene more horizontal space. This matters for a side-scrolling game because the player needs room to see the world ahead, and large landmarks such as trees and shacks need enough space to breathe.
+
+I also slowed the player movement. Fast movement made sense while testing combat, but it worked against the new mood. A slower walk gives the player more time to notice the parallax, fog, tree canopy, shack, rope swing, grass, and fireflies. This shows how game feel is not only about responsiveness; sometimes the right pace depends on the scene's emotional goal.
+
+For now, enemies and combat are hidden behind an opening scene mode. The zombie, fireball, death effect, and respawn code still exists, but it is not active during this scene. This keeps earlier work safe while allowing this milestone to focus on atmosphere. It is a useful pattern: systems can be temporarily gated instead of deleted when the project needs a quieter moment.
+
+The player was redesigned to fit the environment better. The bright blue wizard was fun for the combat phase, but it stood out too much against the warm forest silhouettes. The player is now a small cloaked figure with a subtle lantern glow. This keeps the character readable while making them feel like part of the world.
+
+The background became denser too. There are now distant tree trunks, fog layers, darker hills, a larger shack with planks and fence pieces, a huge foreground tree with roots and thick branches, a rope swing, canopy shadows, foreground grass, and fireflies. Each piece is still made from Pygame shapes, but the combined result feels much closer to a composed scene.
+
+### Lessons Learned
+
+- A wider aspect ratio can change the entire feeling of a side-scrolling scene.
+- Slower movement can support atmosphere when exploration matters more than combat.
+- Opening scenes can temporarily hide gameplay systems without deleting them.
+- Character design should match the world, not fight against it.
+- Dense layered silhouettes can create detail without finished image assets.
+- A milestone can focus on mood and presentation while preserving previous mechanics for later.

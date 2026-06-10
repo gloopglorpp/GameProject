@@ -165,3 +165,13 @@
 - Added a dark foreground ridge, richer grass strokes, and vignette framing
 - Kept the wizard, zombie, fireball, and respawn gameplay unchanged while improving the art direction
 - Learned how multiple simple transparent layers can create a more detailed scene without importing art assets
+
+- Widened the game window from 800x600 to 1280x720 for a more cinematic view
+- Slowed player movement so the player has more time to take in the scene
+- Added an opening scene mode that hides enemies, fireballs, and combat effects for now
+- Reworked the forest into a denser composition with distant trunks, heavy canopy, and stronger silhouettes
+- Enlarged the tree into a foreground landmark with roots, thick branches, and a hanging swing
+- Expanded the abandoned shack with a larger broken shape, lit window, planks, and fence pieces
+- Changed the player from a bright wizard into a small cloaked silhouette with a warm lantern glow
+- Updated the controls menu and README to match the quieter opening scene
+- Learned how temporarily gating systems can let one milestone focus on art direction without deleting earlier gameplay work
