@@ -199,3 +199,10 @@
 - Changed opening-scene movement so the player walks across the screen instead of staying fixed while the world scrolls
 - Kept enemies, fireballs, and older background assets inactive for the quiet opening scene
 - Updated README, tasks, and background asset notes to describe the single-image setup
+
+- Added a small group of 3-6 amber fireflies that stay near the player instead of spawning across the scene
+- Used the player rectangle to calculate a target point around the character's head
+- Gave each firefly its own orbit angle, radius, speed, jitter, pulse, and follow strength
+- Added occasional dart behavior so fireflies sometimes zip toward the head or back away
+- Drew each firefly with a soft amber glow and bright core
+- Kept the firefly system separate from background art and collision logic

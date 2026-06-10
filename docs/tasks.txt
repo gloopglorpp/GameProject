@@ -37,6 +37,9 @@
 [x] Disable the older multi-layer background draw order for the opening scene
 [x] Move the opening-scene ground line onto the black grass in the artwork
 [x] Make the opening-scene character walk directly across the screen
+[x] Add 3-6 player-following fireflies near the character head
+[x] Give each firefly unique orbit radius, angle, speed, jitter, and pulse
+[x] Add occasional firefly dart behavior toward and away from the player
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu
