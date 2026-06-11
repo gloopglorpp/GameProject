@@ -37,6 +37,11 @@
 [x] Disable the older multi-layer background draw order for the opening scene
 [x] Move the opening-scene ground line onto the black grass in the artwork
 [x] Make the opening-scene character walk directly across the screen
+[x] Replace old background asset set with one wide forest artwork
+[x] Add 12000x2000 area_01_forest background image
+[x] Set game window to 1920x1080
+[x] Spawn opening-scene player in the centre of the screen
+[x] Add camera follow using the player's world position
 [x] Add jumping
 [x] Add pause menu
 [x] Move controls text into pause menu
@@ -51,3 +56,6 @@
 [ ] Add enemy attacks
 [ ] Add inventory
 [ ] Add loot drops
+[x] Add living ideas checklist for future atmosphere and world design
+[x] Replace area_01_forest with revised wide artwork
+[x] Remove player ground shadow for a cleaner silhouette style

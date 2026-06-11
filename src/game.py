@@ -5,12 +5,12 @@ from pathlib import Path
 import pygame
 
 
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
 FPS = 60
-PLAYER_SCREEN_X = 280
 
 PLAYER_SIZE = 56
+PLAYER_SCREEN_X = SCREEN_WIDTH // 2 - PLAYER_SIZE // 2
 PLAYER_SPEED = 3
 JUMP_STRENGTH = -16
 GRAVITY = 1
@@ -55,15 +55,11 @@ SMOKE_COLORS = [
     (120, 122, 116),
 ]
 
-GROUND_Y = 696
+GROUND_Y = 930
 
 BACKGROUND_DIR = Path(__file__).resolve().parent.parent / "assets" / "backgrounds"
-BACKGROUND_LAYER_SPECS = [
-    {"name": "sky", "filename": "sky.png", "speed": 0.0, "drift": 0.0, "tile": False},
-]
-BACKGROUND_PLACEHOLDER_COLORS = {
-    "sky": (178, 90, 62, 255),
-}
+BACKGROUND_IMAGE_NAME = "area_01_forest.png"
+BACKGROUND_VIEW_Y = 480
 TEXT_COLOR = (235, 238, 245)
 MUTED_TEXT_COLOR = (155, 165, 180)
 MENU_OVERLAY_COLOR = (12, 16, 18, 175)
@@ -78,86 +74,41 @@ def draw_text(screen, font, text, x, y, color=TEXT_COLOR):
     screen.blit(text_surface, (x, y))
 
 
-def create_placeholder_background_layer(layer_name):
-    surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    surface.fill(BACKGROUND_PLACEHOLDER_COLORS[layer_name])
-    return surface
+def load_background_image():
+    path = BACKGROUND_DIR / BACKGROUND_IMAGE_NAME
+    image = pygame.image.load(path).convert()
+
+    if image.get_width() < SCREEN_WIDTH or image.get_height() < SCREEN_HEIGHT:
+        scale = max(SCREEN_WIDTH / image.get_width(), SCREEN_HEIGHT / image.get_height())
+        scaled_size = (int(image.get_width() * scale), int(image.get_height() * scale))
+        image = pygame.transform.smoothscale(image, scaled_size)
+
+    return image
 
 
-def scale_background_layer(image, spec):
-    width, height = image.get_size()
-
-    if "width_ratio" in spec:
-        target_width = int(SCREEN_WIDTH * spec["width_ratio"])
-        scale = target_width / width
-    else:
-        scale = max(SCREEN_WIDTH / width, SCREEN_HEIGHT / height)
-
-    scaled_size = (max(1, int(width * scale)), max(1, int(height * scale)))
-
-    if scaled_size == image.get_size():
-        return image
-
-    return pygame.transform.smoothscale(image, scaled_size)
+def clamp(value, minimum, maximum):
+    return max(minimum, min(value, maximum))
 
 
-def load_background_layers():
-    layers = []
-
-    for spec in BACKGROUND_LAYER_SPECS:
-        path = BACKGROUND_DIR / spec["filename"]
-        if path.exists():
-            image = pygame.image.load(path).convert_alpha()
-        else:
-            image = create_placeholder_background_layer(spec["name"])
-
-        layers.append({
-            "image": scale_background_layer(image, spec),
-            "speed": spec["speed"],
-            "drift": spec["drift"],
-            "tile": spec["tile"],
-            "align": spec.get("align", "top"),
-            "spacing": spec.get("spacing"),
-        })
-
-    return layers
+def get_camera_x(player_world_x, background_image):
+    max_camera_x = max(0, background_image.get_width() - SCREEN_WIDTH)
+    player_center_x = player_world_x + PLAYER_SIZE / 2
+    return clamp(player_center_x - SCREEN_WIDTH / 2, 0, max_camera_x)
 
 
-def get_background_layer_y(image, align):
-    if align == "bottom":
-        return SCREEN_HEIGHT - image.get_height()
-
-    return 0
+def get_background_view_y(background_image):
+    max_view_y = max(0, background_image.get_height() - SCREEN_HEIGHT)
+    return min(BACKGROUND_VIEW_Y, max_view_y)
 
 
-def draw_background_layer(screen, image, offset, tile, align, spacing=None):
-    y = get_background_layer_y(image, align)
-
-    if not tile:
-        screen.blit(image, (0, y))
-        return
-
-    image_width = image.get_width()
-    repeat_width = spacing or image_width
-    start_x = -int(offset % repeat_width)
-    x = start_x
-
-    while x < SCREEN_WIDTH:
-        screen.blit(image, (x, y))
-        x += repeat_width
-
-
-def draw_background(screen, background_layers, world_x, background_time):
-    for layer in background_layers:
-        offset = world_x * layer["speed"] + background_time * layer["drift"]
-        draw_background_layer(
-            screen,
-            layer["image"],
-            offset,
-            layer["tile"],
-            layer["align"],
-            layer["spacing"],
-        )
+def draw_background(screen, background_image, camera_x):
+    source_rect = pygame.Rect(
+        int(camera_x),
+        get_background_view_y(background_image),
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+    )
+    screen.blit(background_image, (0, 0), source_rect)
 
 
 def get_pause_buttons():
@@ -236,9 +187,6 @@ def draw_player(screen, player_rect, player_facing, animation_frame, is_moving, 
     step = math.sin(animation_frame) if is_moving else 0
     bounce = abs(step) * 1.5 if is_moving and not is_jumping else 0
 
-    shadow = pygame.Surface((82, 26), pygame.SRCALPHA)
-    pygame.draw.ellipse(shadow, (0, 0, 0, 90), (0, 0, 82, 20))
-    screen.blit(shadow, (player_rect.centerx - 41, GROUND_Y - 8))
 
     head_center = (player_rect.centerx, player_rect.y + 12 - bounce)
     neck = (player_rect.centerx, player_rect.y + 24 - bounce)
@@ -459,8 +407,9 @@ def run_game(max_frames=None):
     font = pygame.font.Font(None, 32)
     title_font = pygame.font.Font(None, 56)
     small_font = pygame.font.Font(None, 24)
-    background_layers = load_background_layers()
+    background_image = load_background_image()
 
+    player_world_x = SCREEN_WIDTH // 2 - PLAYER_SIZE // 2
     player_rect = pygame.Rect(PLAYER_SCREEN_X, GROUND_Y - PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE)
     enemy_world_x = 500
     enemy_rect = pygame.Rect(enemy_world_x, GROUND_Y - ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE)
@@ -552,14 +501,15 @@ def run_game(max_frames=None):
 
             if keys[pygame.K_a]:
                 if OPENING_SCENE_MODE:
-                    player_rect.x = max(20, player_rect.x - PLAYER_SPEED)
+                    player_world_x = max(0, player_world_x - PLAYER_SPEED)
                 else:
                     world_x = max(0, world_x - PLAYER_SPEED)
                 player_facing = -1
                 player_is_moving = True
             if keys[pygame.K_d]:
                 if OPENING_SCENE_MODE:
-                    player_rect.x = min(SCREEN_WIDTH - PLAYER_SIZE - 20, player_rect.x + PLAYER_SPEED)
+                    max_player_world_x = background_image.get_width() - PLAYER_SIZE
+                    player_world_x = min(max_player_world_x, player_world_x + PLAYER_SPEED)
                 else:
                     world_x += PLAYER_SPEED
                 player_facing = 1
@@ -614,9 +564,15 @@ def run_game(max_frames=None):
                 elif fireball["age"] > FIREBALL_LIFETIME:
                     fireballs.remove(fireball)
 
+        if OPENING_SCENE_MODE:
+            camera_x = get_camera_x(player_world_x, background_image)
+            player_rect.x = int(player_world_x - camera_x)
+        else:
+            camera_x = world_x
+
         enemy_rect.x = int(enemy_world_x - world_x + PLAYER_SCREEN_X)
 
-        draw_background(screen, background_layers, world_x, background_time)
+        draw_background(screen, background_image, camera_x)
 
         if not OPENING_SCENE_MODE:
             draw_death_particles(screen, death_particles, world_x)

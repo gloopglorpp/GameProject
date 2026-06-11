@@ -199,3 +199,16 @@
 - Changed opening-scene movement so the player walks across the screen instead of staying fixed while the world scrolls
 - Kept enemies, fireballs, and older background assets inactive for the quiet opening scene
 - Updated README, tasks, and background asset notes to describe the single-image setup
+
+2026-06-11
+
+- Removed the older multi-image background asset set from the active scene
+- Added `area_01_forest.png` as one 12000x2000 opening-area artwork strip
+- Increased the game window to 1920x1080 for a wider cinematic view
+- Cropped the tall artwork so the player walks along the black grass band
+- Spawned the player in the centre of the screen
+- Added a camera that follows the player's world position while clamping to the edges of the background image
+- Kept player movement, jumping, pause menu, and collision code separate from the background artwork
+- Replaced `area_01_forest.png` with the revised wide forest artwork while keeping the same camera pipeline
+- Created `docs/ideas.md` as a living brainstorming checklist for atmosphere, world design, sound, weather, motifs, and future moments
+- Removed the player's oval ground shadow so the character reads more like a clean silhouette on the black grass

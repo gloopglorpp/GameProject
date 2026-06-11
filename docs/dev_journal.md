@@ -573,3 +573,39 @@ Movement changed too. With a single static background image, the old side-scroll
 - Movement style depends on the background style: a static scene benefits from direct screen movement.
 - Keeping older assets inactive is different from deleting them; they can still be reused later.
 - A simpler background setup can make the opening scene feel more focused.
+
+## 2026-06-11 — Switching to a Wide Background Image and Camera
+
+The latest visual step was to stop treating the background like a small screen-sized picture. Instead, the opening scene now uses one very wide image called `area_01_forest.png`. The image is 12000 pixels wide and 2000 pixels tall, while the game window is 1920x1080. This means the game is no longer showing the whole image at once. It is showing a camera-sized crop from inside the larger artwork.
+
+This is an important change because it introduces the difference between world position and screen position. The player now has a world x-position that says where they are inside the full background image. The camera also has an x-position that says which part of the large image should currently be visible. The player's screen position is worked out by subtracting the camera position from the player's world position.
+
+At the start of the opening scene, the player spawns in the centre of the screen. As the player walks, the camera follows them, keeping the view focused on the character while still clamping to the left and right edges of the background. This stops the camera from showing empty space beyond the artwork.
+
+The vertical crop is also chosen carefully. The background image is taller than the window, so the game uses a fixed `BACKGROUND_VIEW_Y` value to decide which slice of the image to show. This places the black grass band near the bottom of the screen, and `GROUND_Y` is set so the player's feet line up with that grass.
+
+This milestone also removed the older experimental background PNG layers from the active scene. The point of this step was to simplify the art pipeline again: one strong image, one camera, one player moving through the scene. The older combat systems still exist in the code, but opening scene mode keeps them hidden so this pass can focus on mood, scale, and movement.
+
+### Lessons Learned
+
+- A large background image can act like a game world when only a camera-sized crop is drawn.
+- World coordinates describe where something exists in the full level.
+- Screen coordinates describe where something appears inside the current window.
+- Camera clamping prevents the game from showing space outside the artwork.
+- A tall artwork can be vertically cropped so the playable ground appears at the right height.
+- Simplifying the art pipeline can make a milestone easier to understand and improve later.
+
+## 2026-06-11 — Refining the Wide Forest Scene
+
+After the wide camera system was working, I replaced `area_01_forest.png` with a revised version of the same 12000x2000 opening-area artwork. Because the filename and dimensions stayed the same, the code did not need a new background system. The camera still loads the same asset path, crops a 1920x1080 view, and follows the player through the image.
+
+I also removed the player's soft oval ground shadow. That shadow was useful when the character needed extra grounding against simpler backgrounds, but the new scene already has a strong black grass silhouette. Removing the shadow makes the player feel more naturally cut into the foreground style instead of sitting on top of it.
+
+The new `docs/ideas.md` file was added as a living brainstorming checklist. It gathers the bigger atmospheric goals: moving-painting design, silhouette composition, weather, sound, recurring motifs, strange objects, environmental encounters, and memorable moments. This keeps loose creative ideas out of the code while still making them easy to return to later.
+
+### Lessons Learned
+
+- Keeping a stable asset filename lets the artwork be revised without changing the loading code.
+- A visual helper can become unnecessary once the background art is strong enough.
+- Removing a small effect can improve style consistency when the scene relies on silhouettes.
+- A separate ideas file is useful for preserving future possibilities without turning them into immediate tasks.
